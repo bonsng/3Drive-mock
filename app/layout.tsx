@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import GlobalNav from "@/ui/Components/global-nav";
+import Providers from "@/ui/providers";
 
 export const metadata: Metadata = {
   title: "3Drive",
@@ -13,10 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`antialiased`}
-      >
-        {children}
+      <body className={`antialiased dark:text-white text-white`}>
+        <Providers>
+          <GlobalNav />
+          {children}
+        </Providers>
       </body>
     </html>
   );
