@@ -3,8 +3,11 @@ import * as THREE from "three";
 
 export default function useGroupRotation(
   ref: React.RefObject<THREE.Group | null>,
+  enabled: boolean,
 ) {
   useEffect(() => {
+    if (!enabled) return;
+
     const group = ref.current;
     if (!group) return;
 
@@ -26,8 +29,8 @@ export default function useGroupRotation(
       lastY = e.clientY;
 
       const damping = 0.002; // smaller value = smoother, slower rotation
-      const angleY = -deltaX * damping;
-      const angleZ = -deltaY * damping;
+      const angleY = deltaX * damping;
+      const angleZ = deltaY * damping;
 
       const pivotY = new THREE.Vector3(-3, 1, 0);
       const pivotZ = new THREE.Vector3(-3, 0, 1);
@@ -58,5 +61,5 @@ export default function useGroupRotation(
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
-  }, [ref]);
+  }, [enabled, ref]);
 }

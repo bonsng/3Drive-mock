@@ -3,6 +3,7 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import PointSphere from "@/ui/Components/point-sphere";
+import CameraZoomControl from "@/ui/Components/3d-components/camera-zoom-control";
 
 export default function MainPage3D() {
   return (
@@ -19,6 +20,7 @@ export default function MainPage3D() {
           dampingFactor={0.03}
           // maxDistance={3.5}
         />
+        <CameraZoomControl />
         {/*<axesHelper args={[1000]} />*/}
       </Canvas>
     </div>

@@ -2,6 +2,7 @@
 
 import { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
+import { DragProvider } from "@/ui/Components/context/file-drag-context";
 
 interface Props {
   children: ReactNode;
@@ -10,7 +11,9 @@ interface Props {
 export default function Providers({ children }: Props) {
   return (
     <>
-      <SessionProvider>{children}</SessionProvider>
+      <SessionProvider>
+        <DragProvider>{children}</DragProvider>
+      </SessionProvider>
     </>
   );
 }

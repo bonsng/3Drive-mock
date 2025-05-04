@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { DragControls, Html, useGLTF } from "@react-three/drei";
+import { Html, useGLTF } from "@react-three/drei";
 import clsx from "clsx";
+import { useFileDrag } from "@/ui/Components/context/file-drag-context";
 
 interface PFileSphere {
   position: number[];
@@ -13,25 +14,26 @@ interface PFileSphere {
 const FileSphere = (props: PFileSphere) => {
   const { position, sphereColor, title } = props;
   const [hovered, setHovered] = useState(false);
-  const meshRef = useRef<THREE.Mesh>(null);
+  const { fileDragging, setFileDragging } = useFileDrag();
+  const meshRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/pdf_sphere_glb.glb");
 
   useEffect(() => {
     const current = document.body.style.cursor;
-    const next = hovered ? "pointer" : "auto";
+    const next = hovered || fileDragging ? "pointer" : "auto";
     if (current !== next) {
       document.body.style.cursor = next;
     }
-  }, [hovered]);
+  }, [hovered, fileDragging]);
 
   useFrame(() => {
-    if (meshRef.current) {
-      const targetScale = hovered ? 1.5 : 1;
-      meshRef.current.scale.lerp(
-        new THREE.Vector3(targetScale, targetScale, targetScale),
-        0.1,
-      );
-    }
+    if (!meshRef.current) return;
+
+    const targetScale = hovered ? 1.5 : 1;
+    meshRef.current.scale.lerp(
+      new THREE.Vector3(targetScale, targetScale, targetScale),
+      0.1,
+    );
   });
 
   const extension = title?.split(".").pop()?.toLowerCase();
@@ -43,6 +45,14 @@ const FileSphere = (props: PFileSphere) => {
       position={[position[0], position[1], position[2]]}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        setFileDragging(true);
+      }}
+      onPointerUp={(e) => {
+        e.stopPropagation();
+        setFileDragging(false);
+      }}
     >
       {isPdf ? (
         <primitive
@@ -59,13 +69,6 @@ const FileSphere = (props: PFileSphere) => {
       {title && (
         <Html center position={[0, 0.05, 0]} distanceFactor={2}>
           <div
-            // style={{
-            //   background: "transparent",
-            //   fontSize: "12px",
-            //   whiteSpace: "nowrap",
-            //   pointerEvents: "none",
-            //   color: "white",
-            // }}
             className={clsx(
               "bg-transparent text-xs whitespace-nowrap transition-colors pointer-events-none rounded-sm p-1",
               { "text-black bg-white font-bold": hovered },
