@@ -2,7 +2,8 @@
 
 import { ReactNode } from "react";
 import { SessionProvider } from "next-auth/react";
-import { DragProvider } from "@/ui/Components/context/file-drag-context";
+import { FileViewerProvider } from "@/ui/Components/context/file-viewer-context";
+import { FileTreeProvider } from "@/ui/Components/context/file-tree-context";
 
 interface Props {
   children: ReactNode;
@@ -12,7 +13,9 @@ export default function Providers({ children }: Props) {
   return (
     <>
       <SessionProvider>
-        <DragProvider>{children}</DragProvider>
+        <FileTreeProvider>
+          <FileViewerProvider>{children}</FileViewerProvider>
+        </FileTreeProvider>
       </SessionProvider>
     </>
   );

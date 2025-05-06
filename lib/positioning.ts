@@ -10,8 +10,8 @@ export function assignPositions(
   tree: Node,
   baseRadius = 0.5,
   radiusStep = 0.8,
-): PositionedNode[] {
-  const result: PositionedNode[] = [];
+): Map<string, PositionedNode> {
+  const nodeMap = new Map<string, PositionedNode>();
 
   function traverse(
     node: Node,
@@ -36,12 +36,14 @@ export function assignPositions(
       position = [x, y, z];
     }
 
-    result.push({
+    const positionedNode: PositionedNode = {
       ...node,
       position,
       depth,
       parentPosition,
-    });
+    };
+
+    nodeMap.set(node.id, positionedNode);
 
     if (node.children && node.children.length > 0) {
       const childCount = node.children.length;
@@ -64,5 +66,5 @@ export function assignPositions(
   }
 
   traverse(tree, 0, [0, Math.PI], [0, 2 * Math.PI]);
-  return result;
+  return nodeMap;
 }

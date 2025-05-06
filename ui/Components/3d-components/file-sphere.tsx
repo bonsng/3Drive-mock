@@ -1,22 +1,52 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useFrame } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { Html, useGLTF } from "@react-three/drei";
 import clsx from "clsx";
-import { useFileDrag } from "@/ui/Components/context/file-drag-context";
+import { useFileViewer } from "@/ui/Components/context/file-viewer-context";
+import { useFileTree } from "@/ui/Components/context/file-tree-context";
 
 interface PFileSphere {
+  id: string;
   position: number[];
   sphereColor: string;
   title?: string;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { position, sphereColor, title } = props;
+  const { id, position, sphereColor, title } = props;
   const [hovered, setHovered] = useState(false);
-  const { fileDragging, setFileDragging } = useFileDrag();
+  const { fileDragging, setFileDragging, setDraggingNodeId } = useFileTree();
   const meshRef = useRef<THREE.Group>(null);
   const { scene } = useGLTF("/models/pdf_sphere_glb.glb");
+  const { openFile, selectedFile } = useFileViewer();
+  const pressTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    pressTimer.current = setTimeout(() => {
+      setFileDragging(true);
+      setDraggingNodeId(id);
+    }, 350);
+  };
+
+  const handlePointerUp = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+    setFileDragging(false);
+    setDraggingNodeId(null);
+  };
+
+  const handlePointerOut = () => {
+    setHovered(false);
+    if (pressTimer.current) {
+      clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
 
   useEffect(() => {
     const current = document.body.style.cursor;
@@ -44,14 +74,12 @@ const FileSphere = (props: PFileSphere) => {
       ref={meshRef}
       position={[position[0], position[1], position[2]]}
       onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-      onPointerDown={(e) => {
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerOut={handlePointerOut}
+      onDoubleClick={(e) => {
         e.stopPropagation();
-        setFileDragging(true);
-      }}
-      onPointerUp={(e) => {
-        e.stopPropagation();
-        setFileDragging(false);
+        if (title) openFile(title);
       }}
     >
       {isPdf ? (
@@ -66,7 +94,7 @@ const FileSphere = (props: PFileSphere) => {
           <meshBasicMaterial color={sphereColor} />
         </mesh>
       )}
-      {title && (
+      {title && !selectedFile && (
         <Html center position={[0, 0.05, 0]} distanceFactor={2}>
           <div
             className={clsx(

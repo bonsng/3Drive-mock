@@ -12,7 +12,7 @@ export default function useGroupRotationMousePosition(
     if (!group) return;
 
     const pivot = new THREE.Vector3(-3, 0, 0);
-    const damping = 0.003;
+    const damping = 0.005;
     const mouse = { x: 0, y: 0 };
     let animationId: number;
 

@@ -1,5 +1,4 @@
 import { Canvas } from "@react-three/fiber";
-import PointSphere from "@/ui/Components/point-sphere";
 import { OrbitControls } from "@react-three/drei";
 
 export function LoginPage3D() {
