@@ -10,6 +10,7 @@ interface FileTreeContextType {
   setFileDragging: (dragging: boolean) => void;
   draggingNodeId: string | null;
   setDraggingNodeId: (id: string | null) => void;
+  moveNodeToFolder: (nodeId: string, targetFolderId: string) => void;
 }
 
 const FileTreeContext = createContext<FileTreeContextType | undefined>(
@@ -27,6 +28,34 @@ export const FileTreeProvider = ({
 
   const nodeMap = useMemo(() => assignPositions(treeData), [treeData]);
 
+  const moveNodeToFolder = (nodeId: string, targetFolderId: string) => {
+    setTreeData((prevTree) => {
+      const cloneTree = structuredClone(prevTree);
+
+      const nodeMap = new Map<string, Node>();
+      const buildMap = (node: Node) => {
+        nodeMap.set(node.id, node);
+        node.children?.forEach(buildMap);
+      };
+      buildMap(cloneTree);
+
+      const node = nodeMap.get(nodeId);
+      const target = nodeMap.get(targetFolderId);
+      if (!node || !target || target.type !== "folder") return prevTree;
+
+      const oldParent = nodeMap.get(node.parentId ?? "");
+      if (oldParent && oldParent.children) {
+        oldParent.children = oldParent.children.filter((n) => n.id !== nodeId);
+      }
+
+      node.parentId = targetFolderId;
+      target.children = target.children || [];
+      target.children.push(node);
+
+      return cloneTree;
+    });
+  };
+
   return (
     <FileTreeContext.Provider
       value={{
@@ -37,6 +66,7 @@ export const FileTreeProvider = ({
         setFileDragging,
         draggingNodeId,
         setDraggingNodeId,
+        moveNodeToFolder,
       }}
     >
       {children}

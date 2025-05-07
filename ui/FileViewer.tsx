@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useFileViewer } from "@/ui/Components/context/file-viewer-context";
 
 export default function FileViewer() {
@@ -14,10 +15,12 @@ export default function FileViewer() {
 
     if (["jpg", "jpeg", "png", "gif", "bmp", "webp"].includes(ext)) {
       return (
-        <img
+        <Image
           src={fileUrl}
           alt={selectedFile}
-          className="max-w-full max-h-full"
+          fill
+          style={{ objectFit: "contain" }}
+          sizes="(max-width: 100%)"
         />
       );
     }

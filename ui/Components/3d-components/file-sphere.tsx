@@ -11,10 +11,11 @@ interface PFileSphere {
   position: number[];
   sphereColor: string;
   title?: string;
+  showSearch: boolean;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { id, position, sphereColor, title } = props;
+  const { id, position, sphereColor, title, showSearch } = props;
   const [hovered, setHovered] = useState(false);
   const { fileDragging, setFileDragging, setDraggingNodeId } = useFileTree();
   const meshRef = useRef<THREE.Group>(null);
@@ -36,6 +37,7 @@ const FileSphere = (props: PFileSphere) => {
       clearTimeout(pressTimer.current);
       pressTimer.current = null;
     }
+
     setFileDragging(false);
     setDraggingNodeId(null);
   };
@@ -73,6 +75,7 @@ const FileSphere = (props: PFileSphere) => {
     <group
       ref={meshRef}
       position={[position[0], position[1], position[2]]}
+      userData={{ id, type: isPdf ? "file" : "folder" }}
       onPointerOver={() => setHovered(true)}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
@@ -98,9 +101,10 @@ const FileSphere = (props: PFileSphere) => {
         <Html center position={[0, 0.05, 0]} distanceFactor={2}>
           <div
             className={clsx(
-              "bg-transparent text-xs whitespace-nowrap transition-colors pointer-events-none rounded-sm p-1",
+              "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1",
               { "text-black bg-white font-bold": hovered },
               { "text-gray-400": !hovered },
+              { "opacity-0 pointer-events-none": showSearch },
             )}
           >
             {title}

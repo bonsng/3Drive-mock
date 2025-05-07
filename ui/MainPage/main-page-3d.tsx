@@ -8,13 +8,21 @@ import FileViewer from "@/ui/FileViewer";
 import FloatingFile from "@/ui/Components/3d-components/floating-file";
 import React from "react";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
+import SearchBar from "@/ui/Components/3d-components/search-bar";
 
 export default function MainPage3D() {
   const { nodeMap, fileDragging, draggingNodeId } = useFileTree();
+
   return (
     <div className="h-[90vh] mt-6 ">
       <div className="z-0 h-full">
-        <Canvas dpr={[1, 2]} camera={{ position: [-3, 0, 0], fov: 60 }}>
+        <Canvas
+          dpr={[1, 2]}
+          camera={{
+            position: [-4, 0, 0],
+            fov: 60,
+          }}
+        >
           <ambientLight intensity={1} />
           <directionalLight position={[-3, 3, 0]} intensity={10} />
           <Finder />
@@ -39,6 +47,7 @@ export default function MainPage3D() {
         )}
       </div>
       <FileViewer />
+      <SearchBar />
     </div>
   );
 }
