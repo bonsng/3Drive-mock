@@ -71,6 +71,7 @@ const Finder = () => {
     nodeMap,
     setFileDragging,
     setDraggingNodeId,
+    moveNodeToFolder,
   ]);
 
   return (
@@ -79,7 +80,7 @@ const Finder = () => {
         <group
           position={[-3, 0, 0]}
           visible={!showSearch}
-          rotation={[0, Math.PI * 0.64, Math.PI * 0.3]}
+          rotation={[0, Math.PI * 0.64, 0]}
         >
           {[...nodeMap.values()].map((node: PositionedNode) => {
             if (draggingNodeId === node.id || hiddenNodeIds.has(node.id))
@@ -90,7 +91,7 @@ const Finder = () => {
                 <FileSphere
                   id={node.id}
                   position={node.position}
-                  sphereColor={node.type === "folder" ? "orange" : "blue"}
+                  type={node.type}
                   title={node.name}
                   showSearch={showSearch}
                 />
