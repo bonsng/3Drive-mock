@@ -4,7 +4,6 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import Finder from "@/ui/Components/finder";
 import CameraZoomControl from "@/ui/Components/3d-components/camera-zoom-control";
-import FileViewer from "@/ui/FileViewer";
 import FloatingFile from "@/ui/Components/3d-components/floating-file";
 import React from "react";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
@@ -46,7 +45,6 @@ export default function MainPage3D() {
           />
         )}
       </div>
-      <FileViewer />
       <SearchBar />
     </div>
   );
