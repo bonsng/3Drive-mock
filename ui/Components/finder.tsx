@@ -12,6 +12,9 @@ import { getDescendantIds } from "@/lib/tree-utils";
 import { useThree } from "@react-three/fiber";
 import { Raycaster } from "three";
 import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
+import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
+import { useModal } from "@/ui/Modal/modal.hook";
+import Swal from "sweetalert2";
 
 const Finder = () => {
   const groupRef = useRef<THREE.Group>(null);
@@ -26,6 +29,8 @@ const Finder = () => {
     setDraggingNodeId,
     moveNodeToFolder,
   } = useFileTree();
+  const { getFolderRefs } = useFolderRefContext();
+  const { openModal, isOpen } = useModal("UploadModal");
   useGroupRotationMousePosition(groupRef, fileDragging);
   useGroupRotation(groupRef, !fileDragging);
 
@@ -38,7 +43,7 @@ const Finder = () => {
       if (fileDragging && draggingNodeId) {
         raycaster.current.setFromCamera(mouse, camera);
         const intersects = raycaster.current.intersectObjects(
-          scene.children,
+          getFolderRefs(),
           true,
         );
 
@@ -60,8 +65,58 @@ const Finder = () => {
       }
     };
 
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      if (isOpen) return;
+
+      const files = e.dataTransfer?.files;
+      if (files && files.length > 0) {
+        const fileArray = Array.from(files);
+        console.log("드롭된 파일들:", fileArray.map((f) => f.name).join(", "));
+
+        const pointer = new THREE.Vector2(
+          (e.clientX / window.innerWidth) * 2 - 1,
+          -(e.clientY / window.innerHeight) * 2 + 1,
+        );
+
+        raycaster.current.setFromCamera(pointer, camera);
+        const intersects = raycaster.current.intersectObjects(
+          getFolderRefs(),
+          true,
+        );
+
+        const folderHit = intersects.find(
+          (hit) => hit.object.parent?.userData?.type === "folder",
+        );
+
+        if (folderHit) {
+          openModal({
+            title: folderHit.object.parent?.userData.id,
+            folderId: folderHit.object.parent?.userData.id,
+            files: fileArray,
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "잘못된 위치입니다.",
+          });
+        }
+      }
+    };
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+    };
+
     window.addEventListener("pointerup", handlePointerUp);
-    return () => window.removeEventListener("pointerup", handlePointerUp);
+    window.addEventListener("drop", handleDrop);
+    window.addEventListener("dragover", handleDragOver);
+    return () => {
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.removeEventListener("drop", handleDrop);
+      window.removeEventListener("dragover", handleDragOver);
+    };
   }, [
     fileDragging,
     draggingNodeId,
@@ -72,6 +127,9 @@ const Finder = () => {
     setFileDragging,
     setDraggingNodeId,
     moveNodeToFolder,
+    getFolderRefs,
+    openModal,
+    isOpen,
   ]);
 
   return (
@@ -93,6 +151,7 @@ const Finder = () => {
                   position={node.position}
                   type={node.type}
                   title={node.name}
+                  url={node.url ?? "https://folder"}
                   showSearch={showSearch}
                 />
 

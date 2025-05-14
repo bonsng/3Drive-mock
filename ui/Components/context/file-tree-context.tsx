@@ -11,6 +11,12 @@ interface FileTreeContextType {
   draggingNodeId: string | null;
   setDraggingNodeId: (id: string | null) => void;
   moveNodeToFolder: (nodeId: string, targetFolderId: string) => void;
+  isMenu: boolean;
+  setIsMenu: (dragging: boolean) => void;
+  menuNodeId: string | null;
+  setMenuNodeId: (id: string | null) => void;
+  contextMenuPos: { x: number; y: number } | null;
+  setContextMenuPos: (pos: { x: number; y: number } | null) => void;
 }
 
 const FileTreeContext = createContext<FileTreeContextType | undefined>(
@@ -25,6 +31,12 @@ export const FileTreeProvider = ({
   const [treeData, setTreeData] = useState<Node>(sampleTree);
   const [fileDragging, setFileDragging] = useState(false);
   const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const [isMenu, setIsMenu] = useState(false);
+  const [menuNodeId, setMenuNodeId] = useState<string | null>(null);
+  const [contextMenuPos, setContextMenuPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const nodeMap = useMemo(() => assignPositions(treeData), [treeData]);
 
@@ -67,6 +79,12 @@ export const FileTreeProvider = ({
         draggingNodeId,
         setDraggingNodeId,
         moveNodeToFolder,
+        isMenu,
+        setIsMenu,
+        menuNodeId,
+        setMenuNodeId,
+        contextMenuPos,
+        setContextMenuPos,
       }}
     >
       {children}

@@ -5,12 +5,29 @@ import { OrbitControls } from "@react-three/drei";
 import Finder from "@/ui/Components/finder";
 import CameraZoomControl from "@/ui/Components/3d-components/camera-zoom-control";
 import FloatingFile from "@/ui/Components/3d-components/floating-file";
-import React from "react";
+import React, { useEffect } from "react";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
 import SearchBar from "@/ui/Components/3d-components/search-bar";
+import ContextMenu from "@/ui/Components/3d-components/context-menu";
 
 export default function MainPage3D() {
-  const { nodeMap, fileDragging, draggingNodeId } = useFileTree();
+  const {
+    nodeMap,
+    fileDragging,
+    draggingNodeId,
+    isMenu,
+    menuNodeId,
+    setIsMenu,
+  } = useFileTree();
+
+  useEffect(() => {
+    const handleClick = () => {
+      setIsMenu(false);
+    };
+
+    window.addEventListener("click", handleClick);
+    return () => window.removeEventListener("click", handleClick);
+  }, [setIsMenu]);
 
   return (
     <div className="h-[90vh] mt-6 ">
@@ -42,6 +59,12 @@ export default function MainPage3D() {
           <FloatingFile
             name={nodeMap.get(draggingNodeId)?.name ?? ""}
             type={nodeMap.get(draggingNodeId)?.type ?? undefined}
+          />
+        )}
+        {isMenu && menuNodeId && (
+          <ContextMenu
+            id={menuNodeId}
+            type={nodeMap.get(menuNodeId)?.type ?? undefined}
           />
         )}
       </div>

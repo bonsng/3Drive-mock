@@ -6,7 +6,7 @@ const FloatingFile = ({
   type,
 }: {
   name: string;
-  type: "file" | "folder" | undefined;
+  type: "file" | "folder" | "root" | undefined;
 }) => {
   const { x, y } = useMousePosition();
 

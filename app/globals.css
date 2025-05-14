@@ -11,6 +11,38 @@
   --font-boldonse: "Boldonse", sans-serif;
 }
 
+@theme {
+  --animate-scale-in: scale-in 0.2s ease-in-out;
+  --animate-scale-out: scale-out 0.2s ease-in-out;
+  --animate-fade-out: fade-out 0.2s ease-in-out;
+  @keyframes scale-in {
+    from {
+      transform: scale(0.6);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes scale-out {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+  }
+  @keyframes fade-out {
+    0% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
 :root{
   box-sizing: border-box;
   height: 100%;

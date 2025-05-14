@@ -8,6 +8,8 @@ import FolderModel from "@/lib/folder-model";
 import FileModel from "@/lib/file-model";
 import { getTypeFromExtension } from "@/lib/extension";
 import { useModal } from "@/ui/Modal/modal.hook";
+import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
+import RootModel from "@/lib/root-model";
 
 interface PFileSphere {
   id: string;
@@ -15,15 +17,25 @@ interface PFileSphere {
   type: string;
   title?: string;
   showSearch: boolean;
+  url: string;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { id, position, type, title, showSearch } = props;
+  const { id, position, type, title, showSearch, url = "" } = props;
   const [hovered, setHovered] = useState(false);
-  const { fileDragging, setFileDragging, setDraggingNodeId } = useFileTree();
+  const {
+    fileDragging,
+    setFileDragging,
+    setDraggingNodeId,
+    setIsMenu,
+    setMenuNodeId,
+    setContextMenuPos,
+  } = useFileTree();
   const meshRef = useRef<THREE.Group>(null);
   const { openModal } = useModal("FileModal");
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
+  const isFile = type === "file";
+  const { registerFolderRef, unregisterFolderRef } = useFolderRefContext();
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -52,6 +64,11 @@ const FileSphere = (props: PFileSphere) => {
     }
   };
 
+  const handleDoubleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (title) openModal({ title, ext: extension, url: url });
+  };
+
   useEffect(() => {
     const current = document.body.style.cursor;
     const next = hovered || fileDragging ? "pointer" : "auto";
@@ -73,7 +90,21 @@ const FileSphere = (props: PFileSphere) => {
   const extension = getTypeFromExtension(
     title?.split(".").pop()?.toLowerCase(),
   );
-  const isFile = type === "file";
+
+  useEffect(() => {
+    if (type === "folder" && meshRef.current) {
+      registerFolderRef(id, meshRef.current);
+      return () => unregisterFolderRef(id);
+    }
+  }, [type, id, registerFolderRef, unregisterFolderRef]);
+
+  const handleContextMenu = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    const { clientX, clientY } = e.nativeEvent;
+    setContextMenuPos({ x: clientX, y: clientY });
+    setIsMenu(true);
+    setMenuNodeId(id);
+  };
 
   return (
     <group
@@ -81,16 +112,18 @@ const FileSphere = (props: PFileSphere) => {
       position={[position[0], position[1], position[2]]}
       userData={{ id, type: isFile ? "file" : "folder" }}
       onPointerOver={() => setHovered(true)}
-      onPointerDown={handlePointerDown}
+      onPointerDown={id !== "root" && handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerOut={handlePointerOut}
-      onDoubleClick={(e) => {
-        e.stopPropagation();
-        if (title) openModal({ title, ext: extension });
-      }}
+      onDoubleClick={isFile && handleDoubleClick}
+      onContextMenu={handleContextMenu}
     >
       {type === "folder" ? (
-        <FolderModel />
+        id === "root" ? (
+          <RootModel />
+        ) : (
+          <FolderModel />
+        )
       ) : (
         <FileModel extension={extension} />
       )}
