@@ -26,6 +26,10 @@ export const extensionTypePairs = [
   { extension: "docx", type: "word" },
   { extension: "dot", type: "word" },
   { extension: "dotx", type: "word" },
+  { extension: "ppt", type: "ppt" },
+  { extension: "pptx", type: "pptx" },
+  { extension: "mp3", type: "music" },
+  { extension: "zip", type: "zip" },
 ];
 
 export function getTypeFromExtension(extension: string | undefined): string {
