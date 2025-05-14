@@ -8,6 +8,10 @@ const pathMap: Record<string, string> = {
   image: "/models/image_sphere_glb.glb",
   photoshop: "/models/photoshop_sphere_glb.glb",
   video: "/models/video_sphere_glb.glb",
+  ppt: "/models/ppt_sphere_glb.glb",
+  pptx: "/models/pptx_sphere_glb.glb",
+  music: "/models/music_sphere_glb.glb",
+  zip: "/models/zip_sphere_glb.glb",
 };
 
 type FileModelProps = {
