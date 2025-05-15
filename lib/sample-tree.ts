@@ -258,3 +258,63 @@ export const sampleTree: Node = {
     },
   ],
 };
+
+export const sampleTrash: Node[] = [
+  {
+    id: "root/trash1.txt",
+    name: "trash1.txt",
+    type: "file",
+    parentId: "root",
+    url: "https://example.com/files/trash1.txt",
+  },
+  {
+    id: "root/trash2.pdf",
+    name: "trash2.pdf",
+    type: "file",
+    parentId: "root",
+    url: "https://example.com/files/trash2.pdf",
+  },
+  {
+    id: "root/trash3.mp3",
+    name: "trash3.mp3",
+    type: "file",
+    parentId: "root",
+    url: "https://example.com/files/trash3.mp3",
+  },
+  {
+    id: "root/trash4.mp4",
+    name: "trash4.mp4",
+    type: "file",
+    parentId: "root",
+    url: "https://example.com/files/trash4.mp4",
+  },
+  {
+    id: "root/design1",
+    name: "design1",
+    type: "folder",
+    parentId: "root",
+    children: [
+      {
+        id: "root/design1/logo2.ai",
+        name: "logo2.ai",
+        type: "file",
+        parentId: "root/design1",
+        url: `https://example.com/files/log2o.ai`,
+      },
+      {
+        id: "root/design1/flyer2.psd",
+        name: "flyer2.psd",
+        type: "file",
+        parentId: "root/design1",
+        url: `https://example.com/files/flyer2.psd`,
+      },
+    ],
+  },
+  {
+    id: "root/trash6.docx",
+    name: "trash6.docx",
+    type: "file",
+    parentId: "root",
+    url: "https://example.com/files/trash6.docx",
+  },
+];

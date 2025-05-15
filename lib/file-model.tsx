@@ -32,6 +32,7 @@ const FileModel = ({ extension = "unknown" }: FileModelProps) => {
   }
   return (
     <primitive
+      receiveShadow={false}
       object={scene.children[0].clone()}
       scale={2}
       position={[0, 0, 0]}

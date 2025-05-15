@@ -168,8 +168,14 @@ const Finder = () => {
           })}
         </group>
       </group>
-      {/*Trash Can*/}
-      <group>
+      <ambientLight intensity={2.0} />
+      <pointLight
+        position={[-102, 1, -1.5]}
+        intensity={20}
+        distance={30}
+        decay={2}
+      />
+      <group position={[-102, 0, 0]}>
         <TrashCan />
       </group>
     </>

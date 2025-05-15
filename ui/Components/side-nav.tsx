@@ -30,8 +30,14 @@ const Dot = ({
   content: { label: string; icon: React.ReactNode };
   view: number;
 }) => {
-  const { setViewState, setToDefault, viewState, toDefault, setShowNav } =
-    useShowNavContext();
+  const {
+    setViewState,
+    setToDefault,
+    viewState,
+    toDefault,
+    setShowNav,
+    setIsTrash,
+  } = useShowNavContext();
   const { setShowSearch } = useShortCutContext();
   const selected = view === viewState;
   return (
@@ -50,8 +56,12 @@ const Dot = ({
         } else if (view === 2) {
           setShowSearch(true);
           setShowNav(false);
+        } else if (view === 1) {
+          setViewState(view);
+          setIsTrash(true);
         } else {
           setViewState(view);
+          setIsTrash(false);
         }
       }}
     >

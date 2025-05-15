@@ -46,15 +46,8 @@ export default function MainPage3D() {
         >
           <ambientLight intensity={1} />
           <directionalLight position={[-3, 3, 0]} intensity={10} />
+
           <Finder />
-          {/*<OrbitControls*/}
-          {/*  enableZoom={true}*/}
-          {/*  enableRotate={false}*/}
-          {/*  enablePan={false}*/}
-          {/*  target={[0, 0, 0]}*/}
-          {/*  enableDamping={true}*/}
-          {/*  dampingFactor={0.03}*/}
-          {/*/>*/}
           <CameraControls
             position={angles[viewState].position}
             target={angles[viewState].target}

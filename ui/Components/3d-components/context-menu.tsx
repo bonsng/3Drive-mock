@@ -9,7 +9,7 @@ const ContextMenu = ({
   id: string;
   type: "file" | "folder" | "root" | undefined;
 }) => {
-  const { contextMenuPos, nodeMap } = useFileTree();
+  const { contextMenuPos, nodeMap, deleteNodeToTrash } = useFileTree();
   const content = nodeMap.get(id);
   const { openModal } = useModal(type === "file" ? "FileModal" : "UploadModal");
   const handleOpen = () => {
@@ -49,10 +49,15 @@ const ContextMenu = ({
         ℹ {type === "file" ? "파일" : "폴더"} 정보
       </div>
       <hr />
-      <div className="px-4 py-2 hover:bg-red-100 cursor-pointer rounded-b-md text-red-600 flex justify-between items-center">
-        <span>휴지통으로 이동</span>
-        <span className="text-xs">Delete</span>
-      </div>
+      {id !== "root" && (
+        <div
+          className="px-4 py-2 hover:bg-red-100 cursor-pointer rounded-b-md text-red-600 flex justify-between items-center"
+          onClick={() => deleteNodeToTrash(id)}
+        >
+          <span>휴지통으로 이동</span>
+          <span className="text-xs">Delete</span>
+        </div>
+      )}
     </div>
   ) : null;
 };

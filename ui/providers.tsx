@@ -19,9 +19,9 @@ export default function Providers({ children }: Props) {
         <NavContextProvider>
           <ModalProvider>
             <ShortCutProvider>
-              <FileTreeProvider>
-                <FolderRefProvider>{children}</FolderRefProvider>
-              </FileTreeProvider>
+              <FolderRefProvider>
+                <FileTreeProvider>{children}</FileTreeProvider>
+              </FolderRefProvider>
             </ShortCutProvider>
           </ModalProvider>
         </NavContextProvider>

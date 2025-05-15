@@ -7,6 +7,8 @@ interface NavContextType {
   setViewState: (value: number) => void;
   toDefault: boolean;
   setToDefault: (value: boolean) => void;
+  isTrash: boolean;
+  setIsTrash: (value: boolean) => void;
 }
 
 const NavContext = createContext<NavContextType | null>(null);
@@ -15,6 +17,7 @@ export const NavContextProvider = ({ children }: { children: ReactNode }) => {
   const [showNav, setShowNav] = useState(true);
   const [viewState, setViewState] = useState(0);
   const [toDefault, setToDefault] = useState(false);
+  const [isTrash, setIsTrash] = useState(false);
 
   return (
     <NavContext.Provider
@@ -25,6 +28,8 @@ export const NavContextProvider = ({ children }: { children: ReactNode }) => {
         setViewState,
         toDefault,
         setToDefault,
+        isTrash,
+        setIsTrash,
       }}
     >
       {children}

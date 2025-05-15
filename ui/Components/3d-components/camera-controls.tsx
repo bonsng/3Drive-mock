@@ -8,7 +8,7 @@ import { useShowNavContext } from "@/ui/Components/context/nav-context";
 
 const CameraControls = ({ position, target }: Angle) => {
   const { camera } = useThree();
-  const { toDefault } = useShowNavContext();
+  const { toDefault, isTrash } = useShowNavContext();
   const ref = useRef<OrbitControlsImpl | null>(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const CameraControls = ({ position, target }: Angle) => {
     <OrbitControls
       ref={ref}
       makeDefault
-      enableZoom={true}
+      enableZoom={!isTrash}
       enableRotate={false}
       enablePan={false}
       target={[0, 0, 0]}

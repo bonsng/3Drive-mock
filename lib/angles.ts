@@ -17,8 +17,8 @@ export const angles: Angle[] = [
   },
   // trashcan
   {
-    position: { x: -102, y: 0, z: 0 },
-    target: { x: -102, y: 3, z: 0 },
+    position: { x: -102, y: 0.5, z: -1.4 },
+    target: { x: -102, y: 0, z: 0.3 },
   },
 ];
 
