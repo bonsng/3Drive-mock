@@ -5,6 +5,7 @@ import React, {
   useState,
   ReactNode,
 } from "react";
+import { useShowNavContext } from "@/ui/Components/context/nav-context";
 
 interface ShortCutContextType {
   showSearch: boolean;
@@ -15,6 +16,7 @@ const ShortCutContext = createContext<ShortCutContextType | null>(null);
 
 export const ShortCutProvider = ({ children }: { children: ReactNode }) => {
   const [showSearch, setShowSearch] = useState(false);
+  const { setShowNav } = useShowNavContext();
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
@@ -23,6 +25,7 @@ export const ShortCutProvider = ({ children }: { children: ReactNode }) => {
         setShowSearch(true);
       } else if (e.key === "Escape") {
         setShowSearch(false);
+        setShowNav(true);
       }
     };
 

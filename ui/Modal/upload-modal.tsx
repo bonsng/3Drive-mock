@@ -178,9 +178,8 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
               Cancel
             </button>
             <button
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer flex justify-center items-center "
+              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer flex justify-center items-center"
               onClick={() => {
-                console.log("업로드할 파일:", uploadedFiles);
                 handleClose();
               }}
               disabled={uploadedFiles.length === 0}

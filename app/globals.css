@@ -15,6 +15,7 @@
   --animate-scale-in: scale-in 0.2s ease-in-out;
   --animate-scale-out: scale-out 0.2s ease-in-out;
   --animate-fade-out: fade-out 0.2s ease-in-out;
+  --animate-slide-in-left :slideInLeft 0.4s ease-in-out;
   @keyframes scale-in {
     from {
       transform: scale(0.6);
@@ -39,6 +40,16 @@
     }
     100% {
       opacity: 0;
+    }
+  }
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100px);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
     }
   }
 }

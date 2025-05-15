@@ -1,7 +1,6 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import Finder from "@/ui/Components/finder";
 import CameraZoomControl from "@/ui/Components/3d-components/camera-zoom-control";
 import FloatingFile from "@/ui/Components/3d-components/floating-file";
@@ -9,6 +8,10 @@ import React, { useEffect } from "react";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
 import SearchBar from "@/ui/Components/3d-components/search-bar";
 import ContextMenu from "@/ui/Components/3d-components/context-menu";
+import SideNav from "@/ui/Components/side-nav";
+import { angles } from "@/lib/angles";
+import CameraControls from "@/ui/Components/3d-components/camera-controls";
+import { useShowNavContext } from "@/ui/Components/context/nav-context";
 
 export default function MainPage3D() {
   const {
@@ -19,6 +22,8 @@ export default function MainPage3D() {
     menuNodeId,
     setIsMenu,
   } = useFileTree();
+
+  const { showNav, viewState } = useShowNavContext();
 
   useEffect(() => {
     const handleClick = () => {
@@ -35,21 +40,24 @@ export default function MainPage3D() {
         <Canvas
           dpr={[1, 2]}
           camera={{
-            position: [-4, 0, 0],
+            position: [-5, 0, 0],
             fov: 60,
           }}
         >
           <ambientLight intensity={1} />
           <directionalLight position={[-3, 3, 0]} intensity={10} />
           <Finder />
-          <OrbitControls
-            enableZoom={true}
-            enableRotate={false}
-            enablePan={false}
-            target={[0, 0, 0]}
-            enableDamping={true}
-            dampingFactor={0.03}
-            // maxDistance={3.5}
+          {/*<OrbitControls*/}
+          {/*  enableZoom={true}*/}
+          {/*  enableRotate={false}*/}
+          {/*  enablePan={false}*/}
+          {/*  target={[0, 0, 0]}*/}
+          {/*  enableDamping={true}*/}
+          {/*  dampingFactor={0.03}*/}
+          {/*/>*/}
+          <CameraControls
+            position={angles[viewState].position}
+            target={angles[viewState].target}
           />
           <CameraZoomControl />
           {/*<axesHelper args={[1000]} />*/}
@@ -68,6 +76,7 @@ export default function MainPage3D() {
           />
         )}
       </div>
+      {showNav && <SideNav />}
       <SearchBar />
     </div>
   );

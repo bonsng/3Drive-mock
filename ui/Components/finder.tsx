@@ -15,6 +15,7 @@ import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
 import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
 import { useModal } from "@/ui/Modal/modal.hook";
 import Swal from "sweetalert2";
+import TrashCan from "@/ui/Components/3d-components/trash-can";
 
 const Finder = () => {
   const groupRef = useRef<THREE.Group>(null);
@@ -166,6 +167,10 @@ const Finder = () => {
             );
           })}
         </group>
+      </group>
+      {/*Trash Can*/}
+      <group>
+        <TrashCan />
       </group>
     </>
   );
