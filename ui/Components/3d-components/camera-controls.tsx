@@ -11,32 +11,6 @@ const CameraControls = ({ position, target }: Angle) => {
   const { toDefault } = useShowNavContext();
   const ref = useRef<OrbitControlsImpl | null>(null);
 
-  function cameraAnimate(): void {
-    if (ref.current) {
-      gsap.timeline().to(camera.position, {
-        duration: 1.5,
-        repeat: 0,
-        x: position.x,
-        y: position.y,
-        z: position.z,
-        ease: "power3.inOut",
-      });
-
-      gsap.timeline().to(
-        ref.current.target,
-        {
-          duration: 1.5,
-          repeat: 0,
-          x: target.x,
-          y: target.y,
-          z: target.z,
-          ease: "power3.inOut",
-        },
-        "<",
-      );
-    }
-  }
-
   useEffect(() => {
     const resetCamera = () => {
       if (ref.current) {
@@ -55,8 +29,33 @@ const CameraControls = ({ position, target }: Angle) => {
   }, [camera.position, toDefault]);
 
   useEffect(() => {
+    function cameraAnimate(): void {
+      if (ref.current) {
+        gsap.timeline().to(camera.position, {
+          duration: 1.5,
+          repeat: 0,
+          x: position.x,
+          y: position.y,
+          z: position.z,
+          ease: "power3.inOut",
+        });
+
+        gsap.timeline().to(
+          ref.current.target,
+          {
+            duration: 1.5,
+            repeat: 0,
+            x: target.x,
+            y: target.y,
+            z: target.z,
+            ease: "power3.inOut",
+          },
+          "<",
+        );
+      }
+    }
     cameraAnimate();
-  }, [target, position, cameraAnimate]);
+  }, [target, position, camera.position]);
 
   return (
     <OrbitControls
