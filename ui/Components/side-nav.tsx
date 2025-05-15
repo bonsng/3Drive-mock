@@ -1,8 +1,9 @@
 import clsx from "clsx";
 import { useShowNavContext } from "@/ui/Components/context/nav-context";
 import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
+import { contents } from "@/lib/side-nav-contents";
+import React from "react";
 
-const contents: string[] = ["Home", "Trash", "Search"];
 const SideNav = () => {
   const { showNav } = useShowNavContext();
   return (
@@ -12,7 +13,7 @@ const SideNav = () => {
           "animate-slide-in-left": showNav,
         })}
       >
-        <div className="fixed flex flex-col h-full items-center justify-center">
+        <div className="fixed flex flex-col h-full items-start justify-center">
           {contents.map((v, idx) => (
             <Dot content={v} view={idx} key={idx}></Dot>
           ))}
@@ -22,7 +23,13 @@ const SideNav = () => {
   );
 };
 
-const Dot = ({ content, view }: { content: string; view: number }) => {
+const Dot = ({
+  content,
+  view,
+}: {
+  content: { label: string; icon: React.ReactNode };
+  view: number;
+}) => {
   const { setViewState, setToDefault, viewState, toDefault, setShowNav } =
     useShowNavContext();
   const { setShowSearch } = useShortCutContext();
@@ -30,7 +37,7 @@ const Dot = ({ content, view }: { content: string; view: number }) => {
   return (
     <div
       className={clsx(
-        "relative w-2 h-2 rounded-2xl my-5 transition-colors cursor-pointer flex justify-start items-center duration-300",
+        "relative my-5 ml-4 transition-colors cursor-pointer flex justify-start items-center duration-300",
         {
           "text-white": selected, // 선택된 경우 하얀색
           "text-gray-500 hover:text-white": !selected, // 기본 회색, 호버 시 하얀색
@@ -48,7 +55,11 @@ const Dot = ({ content, view }: { content: string; view: number }) => {
         }
       }}
     >
-      <p className="transition-opacity duration-300">{content}</p>
+      {content.icon}
+
+      <p className={clsx("ml-3 transition-opacity duration-300")}>
+        {content.label}
+      </p>
     </div>
   );
 };
