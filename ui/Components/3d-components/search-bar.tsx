@@ -20,13 +20,13 @@ export default function SearchBar() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="fixed top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
+          className="fixed top-1/5 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50"
         >
           <input
             ref={inputRef}
             type="text"
             placeholder="Search for apps and commands..."
-            className="px-4 py-2 text-sm text-gray-300 bg-[#1e1e1e] border border-[#333] rounded shadow-md w-80 outline-none placeholder-gray-500"
+            className="px-6 py-3 text-md text-gray-300 bg-[#1e1e1e] border border-[#333] rounded shadow-md w-96 outline-none placeholder-gray-500"
           />
         </motion.div>
       )}

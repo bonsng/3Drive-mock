@@ -2,10 +2,14 @@ import type { Metadata } from "next";
 import "./globals.css";
 import GlobalNav from "@/ui/Components/global-nav";
 import Providers from "@/ui/providers";
+import React from "react";
 
 export const metadata: Metadata = {
   title: "3Drive",
   description: "3D Cloud Storage Service",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({

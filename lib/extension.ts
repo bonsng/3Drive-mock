@@ -30,6 +30,7 @@ export const extensionTypePairs = [
   { extension: "pptx", type: "pptx" },
   { extension: "mp3", type: "music" },
   { extension: "zip", type: "zip" },
+  { extension: "txt", type: "text" },
 ];
 
 export function getTypeFromExtension(extension: string | undefined): string {
