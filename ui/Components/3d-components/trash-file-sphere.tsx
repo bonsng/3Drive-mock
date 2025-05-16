@@ -6,6 +6,8 @@ import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import clsx from "clsx";
+import Swal from "sweetalert2";
+import { useFileTree } from "@/ui/Components/context/file-tree-context";
 
 interface PTrashFileSphere {
   id: string;
@@ -19,6 +21,7 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
   const { id, position, type, title, onHover } = props;
   const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
+  const { restoreNodeFromTrash } = useFileTree();
 
   useFrame(() => {
     if (!groupRef.current) return;
@@ -50,6 +53,22 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
     onHover(undefined);
   };
 
+  const handleDoubleClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    Swal.fire({
+      title: `이 ${type === "file" ? "파일" : "폴더"}는 휴지통에 있습니다.`,
+      text: `이 ${type === "file" ? "파일" : "폴더"}를 보려면 휴지통에서 복원해야 합니다.`,
+      showCancelButton: true,
+      confirmButtonText: "복원",
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
+        restoreNodeFromTrash(id);
+        Swal.fire("Success!", "", "success");
+      }
+    });
+  };
+
   return (
     <>
       <group
@@ -57,6 +76,7 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
         position={[...position]}
         onPointerOver={handlePointerOver}
         onPointerOut={handlePointerOut}
+        onDoubleClick={handleDoubleClick}
       >
         {type === "folder" ? (
           <FolderModel />

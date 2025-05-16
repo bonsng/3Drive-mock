@@ -15,6 +15,7 @@ interface FileTreeContextType {
   setDraggingNodeId: (id: string | null) => void;
   moveNodeToFolder: (nodeId: string, targetFolderId: string) => void;
   deleteNodeToTrash: (nodeId: string) => void;
+  restoreNodeFromTrash: (nodeId: string) => void;
   isMenu: boolean;
   setIsMenu: (dragging: boolean) => void;
   menuNodeId: string | null;
@@ -103,6 +104,32 @@ export const FileTreeProvider = ({
     });
   };
 
+  const restoreNodeFromTrash = (nodeId: string) => {
+    const node = trashData.find((n) => n.id === nodeId);
+    if (!node) return;
+
+    setTrashData((prev) => prev.filter((n) => n.id !== nodeId));
+
+    setTreeData((prevTree) => {
+      const cloneTree = structuredClone(prevTree);
+
+      const nodeMap = new Map<string, Node>();
+      const buildMap = (n: Node) => {
+        nodeMap.set(n.id, n);
+        n.children?.forEach(buildMap);
+      };
+      buildMap(cloneTree);
+
+      const parent = nodeMap.get(node.parentId ?? "");
+      if (!parent || parent.type !== "folder") return prevTree;
+
+      parent.children = parent.children || [];
+      parent.children.push(node);
+
+      return cloneTree;
+    });
+  };
+
   return (
     <FileTreeContext.Provider
       value={{
@@ -115,6 +142,7 @@ export const FileTreeProvider = ({
         setDraggingNodeId,
         moveNodeToFolder,
         deleteNodeToTrash,
+        restoreNodeFromTrash,
         isMenu,
         setIsMenu,
         menuNodeId,
