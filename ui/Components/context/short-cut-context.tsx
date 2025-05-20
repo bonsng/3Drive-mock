@@ -16,22 +16,25 @@ const ShortCutContext = createContext<ShortCutContextType | null>(null);
 
 export const ShortCutProvider = ({ children }: { children: ReactNode }) => {
   const [showSearch, setShowSearch] = useState(false);
-  const { setShowNav } = useShowNavContext();
+  const { setShowNav, setViewState } = useShowNavContext();
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f") {
         e.preventDefault();
         setShowSearch(true);
+        setShowNav(false);
+        setViewState(2);
       } else if (e.key === "Escape") {
         setShowSearch(false);
         setShowNav(true);
+        setViewState(0);
       }
     };
 
     window.addEventListener("keydown", handle);
     return () => window.removeEventListener("keydown", handle);
-  }, []);
+  }, [setShowNav, setViewState]);
 
   return (
     <ShortCutContext.Provider value={{ showSearch, setShowSearch }}>

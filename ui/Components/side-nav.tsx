@@ -56,12 +56,13 @@ const Dot = ({
         } else if (view === 2) {
           setShowSearch(true);
           setShowNav(false);
+          setViewState(view);
         } else if (view === 1) {
           setViewState(view);
           setIsTrash(true);
         } else {
           setViewState(view);
-          setIsTrash(false);
+          setTimeout(() => setIsTrash(false), 500);
         }
       }}
     >

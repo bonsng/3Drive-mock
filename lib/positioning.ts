@@ -10,8 +10,8 @@ export function assignPositions(
   tree: Node,
   baseRadius = 0.5,
   radiusStep = 0.8,
-): Map<string, PositionedNode> {
-  const nodeMap = new Map<string, PositionedNode>();
+): Map<number, PositionedNode> {
+  const nodeMap = new Map<number, PositionedNode>();
 
   function traverse(
     node: Node,

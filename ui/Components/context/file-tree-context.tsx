@@ -8,20 +8,23 @@ interface FileTreeContextType {
   setTreeData: (tree: Node) => void;
   trashData: Node[];
 
-  nodeMap: Map<string, PositionedNode>;
+  nodePositionMap: Map<number, PositionedNode>;
   fileDragging: boolean;
   setFileDragging: (dragging: boolean) => void;
-  draggingNodeId: string | null;
-  setDraggingNodeId: (id: string | null) => void;
-  moveNodeToFolder: (nodeId: string, targetFolderId: string) => void;
-  deleteNodeToTrash: (nodeId: string) => void;
-  restoreNodeFromTrash: (nodeId: string) => void;
+  draggingNodeId: number | null;
+  setDraggingNodeId: (id: number | null) => void;
+  moveNodeToFolder: (nodeId: number, targetFolderId: number) => void;
+  deleteNodeToTrash: (nodeId: number) => void;
+  restoreNodeFromTrash: (nodeId: number) => void;
   isMenu: boolean;
   setIsMenu: (dragging: boolean) => void;
-  menuNodeId: string | null;
-  setMenuNodeId: (id: string | null) => void;
+  menuNodeId: number | null;
+  setMenuNodeId: (id: number | null) => void;
   contextMenuPos: { x: number; y: number } | null;
   setContextMenuPos: (pos: { x: number; y: number } | null) => void;
+  setSearchQuery: (query: string) => void;
+  matchedNodes: PositionedNode[];
+  getPathFromNodeId: (nodeId: number) => string[];
 }
 
 const FileTreeContext = createContext<FileTreeContextType | undefined>(
@@ -36,22 +39,48 @@ export const FileTreeProvider = ({
   const [treeData, setTreeData] = useState<Node>(sampleTree);
   const [trashData, setTrashData] = useState<Node[]>(sampleTrash);
   const [fileDragging, setFileDragging] = useState(false);
-  const [draggingNodeId, setDraggingNodeId] = useState<string | null>(null);
+  const [draggingNodeId, setDraggingNodeId] = useState<number | null>(null);
   const [isMenu, setIsMenu] = useState(false);
-  const [menuNodeId, setMenuNodeId] = useState<string | null>(null);
+  const [menuNodeId, setMenuNodeId] = useState<number | null>(null);
   const [contextMenuPos, setContextMenuPos] = useState<{
     x: number;
     y: number;
   } | null>(null);
   const { unregisterFolderRef } = useFolderRefContext();
+  const [searchQuery, setSearchQuery] = useState("");
+  const nodePositionMap = useMemo(() => assignPositions(treeData), [treeData]);
+  const matchedNodes = useMemo(() => {
+    if (!searchQuery) return [];
+    return [...nodePositionMap.values()].filter((node) =>
+      node.name.toLowerCase().includes(searchQuery.toLowerCase()),
+    );
+  }, [searchQuery, nodePositionMap]);
 
-  const nodeMap = useMemo(() => assignPositions(treeData), [treeData]);
+  const getPathFromNodeId = (nodeId: number): string[] => {
+    const nodeMap = new Map<number, Node>();
+    const buildMap = (node: Node) => {
+      nodeMap.set(node.id, node);
+      node.children?.forEach(buildMap);
+    };
+    buildMap(treeData);
 
-  const moveNodeToFolder = (nodeId: string, targetFolderId: string) => {
+    const path: string[] = [];
+    let current = nodeMap.get(nodeId);
+
+    while (current) {
+      path.unshift(current.name);
+      if (current.parentId === null) break;
+      current = nodeMap.get(current.parentId);
+    }
+
+    return path;
+  };
+
+  const moveNodeToFolder = (nodeId: number, targetFolderId: number) => {
     setTreeData((prevTree) => {
       const cloneTree = structuredClone(prevTree);
 
-      const nodeMap = new Map<string, Node>();
+      const nodeMap = new Map<number, Node>();
       const buildMap = (node: Node) => {
         nodeMap.set(node.id, node);
         node.children?.forEach(buildMap);
@@ -60,9 +89,10 @@ export const FileTreeProvider = ({
 
       const node = nodeMap.get(nodeId);
       const target = nodeMap.get(targetFolderId);
-      if (!node || !target || target.type !== "folder") return prevTree;
+      if (!node || !target || target.type !== "folder" || !node.parentId)
+        return prevTree;
 
-      const oldParent = nodeMap.get(node.parentId ?? "");
+      const oldParent = nodeMap.get(node.parentId);
       if (oldParent && oldParent.children) {
         oldParent.children = oldParent.children.filter((n) => n.id !== nodeId);
       }
@@ -75,11 +105,11 @@ export const FileTreeProvider = ({
     });
   };
 
-  const deleteNodeToTrash = (nodeId: string) => {
+  const deleteNodeToTrash = (nodeId: number) => {
     unregisterFolderRef(nodeId);
     setTreeData((prevTree) => {
       const cloneTree = structuredClone(prevTree);
-      const nodeMap = new Map<string, Node>();
+      const nodeMap = new Map<number, Node>();
       const buildMap = (node: Node) => {
         nodeMap.set(node.id, node);
         node.children?.forEach(buildMap);
@@ -87,9 +117,9 @@ export const FileTreeProvider = ({
       buildMap(cloneTree);
 
       const node = nodeMap.get(nodeId);
-      if (!node) return prevTree;
+      if (!node || !node.parentId) return prevTree;
 
-      const parent = nodeMap.get(node.parentId ?? "");
+      const parent = nodeMap.get(node.parentId);
       if (parent && parent.children) {
         parent.children = parent.children.filter(
           (child) => child.id !== nodeId,
@@ -104,7 +134,7 @@ export const FileTreeProvider = ({
     });
   };
 
-  const restoreNodeFromTrash = (nodeId: string) => {
+  const restoreNodeFromTrash = (nodeId: number) => {
     const node = trashData.find((n) => n.id === nodeId);
     if (!node) return;
 
@@ -113,14 +143,14 @@ export const FileTreeProvider = ({
     setTreeData((prevTree) => {
       const cloneTree = structuredClone(prevTree);
 
-      const nodeMap = new Map<string, Node>();
+      const nodeMap = new Map<number, Node>();
       const buildMap = (n: Node) => {
         nodeMap.set(n.id, n);
         n.children?.forEach(buildMap);
       };
       buildMap(cloneTree);
-
-      const parent = nodeMap.get(node.parentId ?? "");
+      if (!node.parentId) return prevTree;
+      const parent = nodeMap.get(node.parentId);
       if (!parent || parent.type !== "folder") return prevTree;
 
       parent.children = parent.children || [];
@@ -135,7 +165,7 @@ export const FileTreeProvider = ({
       value={{
         treeData,
         setTreeData,
-        nodeMap,
+        nodePositionMap,
         fileDragging,
         setFileDragging,
         draggingNodeId,
@@ -150,6 +180,9 @@ export const FileTreeProvider = ({
         contextMenuPos,
         setContextMenuPos,
         trashData,
+        setSearchQuery,
+        matchedNodes,
+        getPathFromNodeId,
       }}
     >
       {children}

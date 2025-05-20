@@ -1,7 +1,7 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { ModalRef } from "@/ui/Modal/modal.type";
 import { useModal } from "@/ui/Modal/modal.hook";
-import FilePreview from "@/ui/Components/file-preview";
+import FilePreview from "@/ui/Components/3d-components/file/file-preview";
 
 export type PFileModal = {
   title: string;

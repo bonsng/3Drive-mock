@@ -2,20 +2,20 @@
 
 import { Canvas } from "@react-three/fiber";
 import Finder from "@/ui/Components/finder";
-import CameraZoomControl from "@/ui/Components/3d-components/camera-zoom-control";
-import FloatingFile from "@/ui/Components/3d-components/floating-file";
+import CameraZoomControl from "@/ui/Components/3d-components/camera/camera-zoom-control";
+import FloatingFile from "@/ui/Components/3d-components/file/floating-file";
 import React, { useEffect } from "react";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
-import SearchBar from "@/ui/Components/3d-components/search-bar";
-import ContextMenu from "@/ui/Components/3d-components/context-menu";
+import SearchBar from "@/ui/Components/3d-components/search/search-bar";
+import ContextMenu from "@/ui/Components/3d-components/file/context-menu";
 import SideNav from "@/ui/Components/side-nav";
 import { angles } from "@/lib/angles";
-import CameraControls from "@/ui/Components/3d-components/camera-controls";
+import CameraControls from "@/ui/Components/3d-components/camera/camera-controls";
 import { useShowNavContext } from "@/ui/Components/context/nav-context";
 
 export default function MainPage3D() {
   const {
-    nodeMap,
+    nodePositionMap,
     fileDragging,
     draggingNodeId,
     isMenu,
@@ -44,7 +44,7 @@ export default function MainPage3D() {
             fov: 60,
           }}
         >
-          <ambientLight intensity={1} />
+          <ambientLight intensity={2.0} />
           <directionalLight position={[-3, 3, 0]} intensity={10} />
 
           <Finder />
@@ -58,14 +58,14 @@ export default function MainPage3D() {
 
         {fileDragging && draggingNodeId && (
           <FloatingFile
-            name={nodeMap.get(draggingNodeId)?.name ?? ""}
-            type={nodeMap.get(draggingNodeId)?.type ?? undefined}
+            name={nodePositionMap.get(draggingNodeId)?.name ?? ""}
+            type={nodePositionMap.get(draggingNodeId)?.type ?? undefined}
           />
         )}
         {isMenu && menuNodeId && (
           <ContextMenu
             id={menuNodeId}
-            type={nodeMap.get(menuNodeId)?.type ?? undefined}
+            type={nodePositionMap.get(menuNodeId)?.type ?? undefined}
           />
         )}
       </div>

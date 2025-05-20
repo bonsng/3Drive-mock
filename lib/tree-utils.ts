@@ -1,10 +1,10 @@
 import { PositionedNode } from "@/lib/positioning";
 
 export function getDescendantIds(
-  nodeId: string,
-  nodeMap: Map<string, PositionedNode>,
-): Set<string> {
-  const descendants = new Set<string>();
+  nodeId: number,
+  nodeMap: Map<number, PositionedNode>,
+): Set<number> {
+  const descendants = new Set<number>();
 
   for (const [id, node] of nodeMap.entries()) {
     let current = node.parentId;

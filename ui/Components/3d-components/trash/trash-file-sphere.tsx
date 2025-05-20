@@ -10,11 +10,13 @@ import Swal from "sweetalert2";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
 
 interface PTrashFileSphere {
-  id: string;
+  id: number;
   position: [number, number, number];
   type: string;
   title?: string;
-  onHover: (title: string | undefined) => void;
+  onHover: (
+    file: { id: number; type: string; title: string } | undefined,
+  ) => void;
 }
 
 const TrashFileSphere = (props: PTrashFileSphere) => {
@@ -44,7 +46,7 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
   const handlePointerOver = (e: PointerEvent) => {
     e.stopPropagation();
     setHovered(true);
-    onHover(title);
+    onHover({ id, type, title: title || "" });
   };
 
   const handlePointerOut = (e: PointerEvent) => {
@@ -74,8 +76,8 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
       <group
         ref={groupRef}
         position={[...position]}
-        onPointerOver={handlePointerOver}
-        onPointerOut={handlePointerOut}
+        onPointerEnter={handlePointerOver}
+        onPointerLeave={handlePointerOut}
         onDoubleClick={handleDoubleClick}
       >
         {type === "folder" ? (

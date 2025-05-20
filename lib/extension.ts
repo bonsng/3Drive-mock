@@ -30,12 +30,11 @@ export const extensionTypePairs = [
   { extension: "pptx", type: "pptx" },
   { extension: "mp3", type: "music" },
   { extension: "zip", type: "zip" },
-  { extension: "txt", type: "text" },
 ];
 
 export function getTypeFromExtension(extension: string | undefined): string {
   const match = extensionTypePairs.find(
     (pair) => pair.extension.toLowerCase() === extension?.toLowerCase(),
   );
-  return match?.type || "unknown";
+  return match?.type || "free";
 }

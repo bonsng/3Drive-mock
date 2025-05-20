@@ -12,6 +12,7 @@ const pathMap: Record<string, string> = {
   pptx: "/models/pptx_sphere_glb.glb",
   music: "/models/music_sphere_glb.glb",
   zip: "/models/zip_sphere_glb.glb",
+  free: "/models/free_sphere_glb.glb",
 };
 
 type FileModelProps = {
@@ -19,17 +20,9 @@ type FileModelProps = {
 };
 
 const FileModel = ({ extension = "unknown" }: FileModelProps) => {
-  const path = pathMap[extension] ?? pathMap["pdf"];
+  const path = pathMap[extension];
   const { scene } = useGLTF(path);
 
-  if (extension === "unknown") {
-    return (
-      <mesh>
-        <sphereGeometry args={[0.02, 8, 8]} />
-        <meshBasicMaterial color={"blue"} />
-      </mesh>
-    );
-  }
   return (
     <primitive
       receiveShadow={false}

@@ -12,16 +12,17 @@ import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context"
 import RootModel from "@/lib/root-model";
 
 interface PFileSphere {
-  id: string;
+  id: number;
   position: number[];
   type: string;
   title?: string;
   showSearch: boolean;
   url: string;
+  parentId: number | null;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { id, position, type, title, showSearch, url = "" } = props;
+  const { id, position, type, title, showSearch, url = "", parentId } = props;
   const [hovered, setHovered] = useState(false);
   const {
     fileDragging,
@@ -112,17 +113,17 @@ const FileSphere = (props: PFileSphere) => {
       position={[position[0], position[1], position[2]]}
       userData={{ id, type: isFile ? "file" : "folder" }}
       onPointerOver={() => setHovered(true)}
-      onPointerDown={id !== "root" && handlePointerDown}
+      onPointerDown={id && handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerOut={handlePointerOut}
       onDoubleClick={isFile && handleDoubleClick}
       onContextMenu={handleContextMenu}
     >
       {type === "folder" ? (
-        id === "root" ? (
-          <RootModel />
-        ) : (
+        parentId ? (
           <FolderModel />
+        ) : (
+          <RootModel />
         )
       ) : (
         <FileModel extension={extension} />

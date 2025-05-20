@@ -4,7 +4,7 @@ import { useModal } from "@/ui/Modal/modal.hook";
 
 export type PUploadModal = {
   title: string;
-  folderId: string;
+  folderId: number;
   files?: File[];
 };
 

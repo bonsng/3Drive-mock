@@ -20,6 +20,11 @@ export const angles: Angle[] = [
     position: { x: -102, y: 0.5, z: -1.4 },
     target: { x: -102, y: 0, z: 0.3 },
   },
+  // search
+  {
+    position: { x: -3, y: 0, z: 0 },
+    target: { x: -3, y: 0, z: -1 },
+  },
 ];
 
 // { x: 20, y: 15, z: 50 },

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import { Line } from "@react-three/drei";
 import * as THREE from "three";
-import FileSphere from "@/ui/Components/3d-components/file-sphere";
+import FileSphere from "@/ui/Components/3d-components/file/file-sphere";
 import useGroupRotation from "@/ui/Components/hooks/use-group-rotation";
 import useGroupRotationMousePosition from "@/ui/Components/hooks/use-group-rotation-mouse-position";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
@@ -15,17 +15,20 @@ import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
 import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
 import { useModal } from "@/ui/Modal/modal.hook";
 import Swal from "sweetalert2";
-import TrashCan from "@/ui/Components/3d-components/trash-can";
+import TrashCan from "@/ui/Components/3d-components/trash/trash-can";
+import { useShowNavContext } from "@/ui/Components/context/nav-context";
+import SearchGroup from "@/ui/Components/3d-components/search/search-group";
 
 const Finder = () => {
   const groupRef = useRef<THREE.Group>(null);
   const raycaster = useRef(new Raycaster());
   const { camera, mouse, scene } = useThree();
   const { showSearch } = useShortCutContext();
+  const { isTrash } = useShowNavContext();
   const {
     fileDragging,
     draggingNodeId,
-    nodeMap,
+    nodePositionMap,
     setFileDragging,
     setDraggingNodeId,
     moveNodeToFolder,
@@ -36,7 +39,7 @@ const Finder = () => {
   useGroupRotation(groupRef, !fileDragging);
 
   const hiddenNodeIds = draggingNodeId
-    ? getDescendantIds(draggingNodeId, nodeMap)
+    ? getDescendantIds(draggingNodeId, nodePositionMap)
     : new Set();
 
   useEffect(() => {
@@ -124,7 +127,7 @@ const Finder = () => {
     mouse,
     camera,
     scene,
-    nodeMap,
+    nodePositionMap,
     setFileDragging,
     setDraggingNodeId,
     moveNodeToFolder,
@@ -141,7 +144,7 @@ const Finder = () => {
           visible={!showSearch}
           rotation={[0, Math.PI * 0.64, 0]}
         >
-          {[...nodeMap.values()].map((node: PositionedNode) => {
+          {[...nodePositionMap.values()].map((node: PositionedNode) => {
             if (draggingNodeId === node.id || hiddenNodeIds.has(node.id))
               return null;
 
@@ -154,6 +157,7 @@ const Finder = () => {
                   title={node.name}
                   url={node.url ?? "https://folder"}
                   showSearch={showSearch}
+                  parentId={node.parentId}
                 />
 
                 {node.parentPosition && (
@@ -168,16 +172,10 @@ const Finder = () => {
           })}
         </group>
       </group>
-      <ambientLight intensity={2.0} />
-      <pointLight
-        position={[-102, 1, -1.5]}
-        intensity={20}
-        distance={30}
-        decay={2}
-      />
-      <group position={[-102, 0, 0]}>
-        <TrashCan />
-      </group>
+
+      {isTrash && <TrashCan />}
+
+      {showSearch && <SearchGroup />}
     </>
   );
 };

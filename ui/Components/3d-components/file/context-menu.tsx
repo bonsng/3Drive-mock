@@ -6,11 +6,11 @@ const ContextMenu = ({
   id,
   type,
 }: {
-  id: string;
+  id: number;
   type: "file" | "folder" | "root" | undefined;
 }) => {
-  const { contextMenuPos, nodeMap, deleteNodeToTrash } = useFileTree();
-  const content = nodeMap.get(id);
+  const { contextMenuPos, nodePositionMap, deleteNodeToTrash } = useFileTree();
+  const content = nodePositionMap.get(id);
   const { openModal } = useModal(type === "file" ? "FileModal" : "UploadModal");
   const handleOpen = () => {
     if (content) {
@@ -40,6 +40,14 @@ const ContextMenu = ({
         <span>{type === "file" ? "열기" : "파일 업로드"}</span>
       </div>
       <hr />
+      {type === "folder" && (
+        <>
+          <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+            📁 폴더 생성
+          </div>
+          <hr />
+        </>
+      )}
       <div className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
         ⬇ 다운로드
       </div>
@@ -49,7 +57,7 @@ const ContextMenu = ({
         ℹ {type === "file" ? "파일" : "폴더"} 정보
       </div>
       <hr />
-      {id !== "root" && (
+      {id && (
         <div
           className="px-4 py-2 hover:bg-red-100 cursor-pointer rounded-b-md text-red-600 flex justify-between items-center"
           onClick={() => deleteNodeToTrash(id)}

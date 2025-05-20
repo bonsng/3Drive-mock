@@ -2,8 +2,8 @@ import React, { createContext, useContext, useRef } from "react";
 import * as THREE from "three";
 
 interface FolderRefContextType {
-  registerFolderRef: (id: string, ref: THREE.Object3D) => void;
-  unregisterFolderRef: (id: string) => void;
+  registerFolderRef: (id: number, ref: THREE.Object3D) => void;
+  unregisterFolderRef: (id: number) => void;
   getFolderRefs: () => THREE.Object3D[];
 }
 
@@ -14,13 +14,14 @@ export const FolderRefProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const folderRefMap = useRef<Map<string, THREE.Object3D>>(new Map());
+  const folderRefMap = useRef<Map<number, THREE.Object3D>>(new Map());
 
-  const registerFolderRef = (id: string, ref: THREE.Object3D) => {
+  const registerFolderRef = (id: number, ref: THREE.Object3D) => {
     folderRefMap.current.set(id, ref);
   };
 
-  const unregisterFolderRef = (id: string) => {
+  const unregisterFolderRef = (id: number) => {
+    if (!folderRefMap.current.has(id)) return;
     folderRefMap.current.delete(id);
   };
 
