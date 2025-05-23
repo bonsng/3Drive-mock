@@ -7,6 +7,7 @@ import { ShortCutProvider } from "@/ui/Components/context/short-cut-context";
 import { ModalProvider } from "@/ui/Modal/modal-context.provider";
 import { FolderRefProvider } from "@/ui/Components/context/folder-ref-context";
 import { NavContextProvider } from "@/ui/Components/context/nav-context";
+import { LoadingProvider } from "@/ui/Components/context/loading-context";
 
 interface Props {
   children: ReactNode;
@@ -16,15 +17,17 @@ export default function Providers({ children }: Props) {
   return (
     <>
       <SessionProvider>
-        <NavContextProvider>
-          <ModalProvider>
-            <ShortCutProvider>
-              <FolderRefProvider>
-                <FileTreeProvider>{children}</FileTreeProvider>
-              </FolderRefProvider>
-            </ShortCutProvider>
-          </ModalProvider>
-        </NavContextProvider>
+        <LoadingProvider>
+          <NavContextProvider>
+            <FolderRefProvider>
+              <FileTreeProvider>
+                <ModalProvider>
+                  <ShortCutProvider>{children}</ShortCutProvider>
+                </ModalProvider>
+              </FileTreeProvider>
+            </FolderRefProvider>
+          </NavContextProvider>
+        </LoadingProvider>
       </SessionProvider>
     </>
   );
