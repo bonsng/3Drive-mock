@@ -12,7 +12,7 @@ export type Angle = {
 export const angles: Angle[] = [
   // default
   {
-    position: { x: -3.6, y: 0, z: 0 },
+    position: { x: -10.6, y: 0, z: 0 },
     target: { x: 0, y: 0, z: 0 },
   },
   // trashcan

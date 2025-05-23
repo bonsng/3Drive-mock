@@ -32,8 +32,8 @@ export default function useGroupRotation(
       const angleY = deltaX * damping;
       const angleZ = deltaY * damping;
 
-      const pivotY = new THREE.Vector3(-3, 1, 0);
-      const pivotZ = new THREE.Vector3(-3, 0, 1);
+      const pivotY = new THREE.Vector3(-10, 1, 0);
+      const pivotZ = new THREE.Vector3(-10, 0, 1);
 
       // Y-axis 회전
       group.position.sub(pivotY);

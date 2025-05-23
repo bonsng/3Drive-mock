@@ -17,7 +17,7 @@ const CameraControls = ({ position, target }: Angle) => {
         gsap.timeline().to(camera.position, {
           duration: 1.0,
           repeat: 0,
-          x: -3.6,
+          x: -11,
           y: 0,
           z: 0,
           ease: "power3.inOut",
