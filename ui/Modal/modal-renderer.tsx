@@ -3,10 +3,12 @@ import { useModalContext } from "./modal-context.provider";
 import { ModalRef, ModalTypes } from "./modal.type";
 import FileModal from "@/ui/Modal/file-modal";
 import UploadModal from "@/ui/Modal/upload-modal";
+import CreateFolderModal from "@/ui/Modal/create-folder-modal";
 
 const MODAL_COMPONENT: Record<ModalTypes, FC<any>> = {
   FileModal: FileModal,
   UploadModal: UploadModal,
+  CreateFolderModal: CreateFolderModal,
 };
 
 export const ModalRenderer: FC = () => {
