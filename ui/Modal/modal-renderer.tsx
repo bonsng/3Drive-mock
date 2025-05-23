@@ -1,21 +1,14 @@
 import { FC, useEffect, useRef } from "react";
 import { useModalContext } from "./modal-context.provider";
-import { ModalRef, ModalTypes } from "./modal.type";
-import FileModal from "@/ui/Modal/file-modal";
-import UploadModal from "@/ui/Modal/upload-modal";
+import { ModalRef } from "./modal.type";
+import FileModal, { PFileModal } from "@/ui/Modal/file-modal";
+import UploadModal, { PUploadModal } from "@/ui/Modal/upload-modal";
 import CreateFolderModal from "@/ui/Modal/create-folder-modal";
-
-const MODAL_COMPONENT: Record<ModalTypes, FC<any>> = {
-  FileModal: FileModal,
-  UploadModal: UploadModal,
-  CreateFolderModal: CreateFolderModal,
-};
+import { PCreateFolderModal } from "@/ui/Modal/create-folder-modal";
 
 export const ModalRenderer: FC = () => {
   const { state } = useModalContext();
   const modalRef = useRef<ModalRef>(null);
-
-  const ModalComponents = MODAL_COMPONENT[state.modalType as ModalTypes];
 
   useEffect(() => {
     if (!state.isOpen || !state.modalType) {
@@ -27,5 +20,38 @@ export const ModalRenderer: FC = () => {
 
   if (!state.isOpen || !state.modalType) return null;
 
-  return <ModalComponents ref={modalRef} {...state.props} />;
+  switch (state.modalType) {
+    case "FileModal":
+      if (
+        !(
+          "title" in state.props &&
+          "ext" in state.props &&
+          "parentId" in state.props
+        )
+      )
+        return null;
+      return <FileModal ref={modalRef} {...(state.props as PFileModal)} />;
+
+    case "UploadModal":
+      if (!("parentId" in state.props && "files" in state.props)) return null;
+      return (
+        <UploadModal
+          ref={modalRef}
+          {...(state.props as unknown as PUploadModal)}
+        />
+      );
+
+    case "CreateFolderModal":
+      if (!("targetFolderId" in state.props && "onCreate" in state.props))
+        return null;
+      return (
+        <CreateFolderModal
+          ref={modalRef}
+          {...(state.props as PCreateFolderModal)}
+        />
+      );
+
+    default:
+      return null;
+  }
 };
