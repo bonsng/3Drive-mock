@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ThreeEvent, useFrame } from "@react-three/fiber";
+import { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+import { ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Html } from "@react-three/drei";
 import clsx from "clsx";
@@ -17,12 +18,11 @@ interface PFileSphere {
   type: string;
   title?: string;
   showSearch: boolean;
-  url: string;
   parentId: number | null;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { id, position, type, title, showSearch, url = "", parentId } = props;
+  const { id, position, type, title, showSearch, parentId } = props;
   const [hovered, setHovered] = useState(false);
   const {
     fileDragging,
@@ -37,6 +37,8 @@ const FileSphere = (props: PFileSphere) => {
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
   const isFile = type === "file";
   const { registerFolderRef, unregisterFolderRef } = useFolderRefContext();
+  const { camera } = useThree();
+  const controls = useThree((state) => state.controls) as OrbitControlsImpl;
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
@@ -65,9 +67,34 @@ const FileSphere = (props: PFileSphere) => {
     }
   };
 
+  const focusCameraOnGroup = () => {
+    if (!meshRef.current) return;
+
+    const targetPosition = new THREE.Vector3();
+    meshRef.current.getWorldPosition(targetPosition);
+
+    const basePosition = new THREE.Vector3(-10, 0, 0);
+    const direction = new THREE.Vector3()
+      .subVectors(targetPosition, basePosition)
+      .normalize();
+    const newCameraPosition = targetPosition
+      .clone()
+      .sub(direction.clone().multiplyScalar(0.3));
+
+    camera.position.copy(newCameraPosition);
+
+    // OrbitControls가 있다면 target 도 갱신
+    if (controls && controls.target) {
+      controls.target.copy(targetPosition);
+      controls.update();
+    } else {
+      camera.lookAt(targetPosition);
+    }
+  };
+
   const handleDoubleClick = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    if (title) openModal({ title, ext: extension, url: url });
+    if (title) openModal({ title, ext: extension, parentId });
   };
 
   useEffect(() => {
@@ -86,6 +113,7 @@ const FileSphere = (props: PFileSphere) => {
       new THREE.Vector3(targetScale, targetScale, targetScale),
       0.1,
     );
+    meshRef.current.lookAt(camera.position);
   });
 
   const extension = getTypeFromExtension(
@@ -116,7 +144,7 @@ const FileSphere = (props: PFileSphere) => {
       onPointerDown={id && handlePointerDown}
       onPointerUp={handlePointerUp}
       onPointerOut={handlePointerOut}
-      onDoubleClick={isFile && handleDoubleClick}
+      onDoubleClick={isFile ? handleDoubleClick : focusCameraOnGroup}
       onContextMenu={handleContextMenu}
     >
       {type === "folder" ? (
@@ -138,8 +166,8 @@ const FileSphere = (props: PFileSphere) => {
         >
           <div
             className={clsx(
-              "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1",
-              { "text-black bg-white font-bold": hovered },
+              "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1 font-poppins",
+              { "text-white font-bold": hovered },
               { "text-gray-400": !hovered },
               { "opacity-0 pointer-events-none": showSearch },
             )}

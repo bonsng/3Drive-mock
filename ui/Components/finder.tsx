@@ -49,7 +49,7 @@ const Finder = () => {
 
   useFrame(() => {
     const distance = camera.position.distanceTo(new THREE.Vector3(-10, 0, 0));
-    let depth = 1;
+    let depth;
     if (distance < 0.9) depth = 4;
     else if (distance < 1.8) depth = 5;
     else if (distance < 2.7) depth = 6;
