@@ -1,7 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
-import { hash } from "bcryptjs";
 
 export default function SignupForm() {
   const [username, setUserName] = useState("");
@@ -23,15 +22,17 @@ export default function SignupForm() {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const hashedPassword = hash(password, 10);
-
-    const res = await fetch("/api/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, email, password: hashedPassword }),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/users/sign-up`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password }),
+      },
+    );
 
     if (res.ok) {
+      console.log(res);
       alert("Welcome!!!");
       router.push("/login");
     } else {

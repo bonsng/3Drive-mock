@@ -1,10 +1,23 @@
-import React, { createContext, useContext, useState, useMemo } from "react";
-import { Node, sampleTrash, sampleTree } from "@/lib/sample-tree";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useMemo,
+  useEffect,
+} from "react";
+import {
+  Node,
+  processBackendTree,
+  sampleTrash,
+  sampleTree,
+} from "@/lib/sample-tree";
 import { assignPositions, PositionedNode } from "@/lib/positioning";
 import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
+import { useSession } from "next-auth/react";
+import { useLoading } from "@/ui/Components/context/loading-context";
 
 interface FileTreeContextType {
-  treeData: Node;
+  treeData: Node | null;
   setTreeData: (tree: Node) => void;
   trashData: Node[];
 
@@ -16,6 +29,15 @@ interface FileTreeContextType {
   moveNodeToFolder: (nodeId: number, targetFolderId: number) => void;
   deleteNodeToTrash: (nodeId: number) => void;
   restoreNodeFromTrash: (nodeId: number) => void;
+  createNewFolder: (
+    targetFolderId: number,
+    folderName: string,
+    newFolderId: number,
+  ) => void;
+  addFilesToFolder: (
+    targetFolderId: number,
+    files: { fileId: number; fileName: string }[],
+  ) => void;
   isMenu: boolean;
   setIsMenu: (dragging: boolean) => void;
   menuNodeId: number | null;
@@ -36,11 +58,60 @@ export const FileTreeProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const [treeData, setTreeData] = useState<Node>(sampleTree);
-  const [trashData, setTrashData] = useState<Node[]>(sampleTrash);
+  const { setIsLoading } = useLoading();
+  const [treeData, setTreeData] = useState<Node | null>(null);
+  const [trashData, setTrashData] = useState<Node[]>([]);
+  const { data: session, status } = useSession();
+
+  useEffect(() => {
+    // if (status !== "authenticated") return;
+
+    const fetchTree = async () => {
+      const token = session?.accessToken;
+      if (!token) {
+        //sample code
+        setTreeData(sampleTree);
+        setTrashData(sampleTrash);
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/structure/full`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          },
+        );
+
+        if (!response.ok) {
+          setTreeData(sampleTree);
+          setTrashData(sampleTrash);
+          return;
+        }
+
+        const result = (await response.json()).result;
+        const { treeData, trashData } = processBackendTree(result);
+        setTreeData(treeData);
+        setTrashData(trashData);
+      } catch (error) {
+        console.error("Error fetching tree data:", error);
+        setTreeData(sampleTree);
+        setTrashData(sampleTrash);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    setIsLoading(true);
+    fetchTree();
+  }, [session, status, setIsLoading]);
   const [fileDragging, setFileDragging] = useState(false);
   const [draggingNodeId, setDraggingNodeId] = useState<number | null>(null);
   const [isMenu, setIsMenu] = useState(false);
+
   const [menuNodeId, setMenuNodeId] = useState<number | null>(null);
   const [contextMenuPos, setContextMenuPos] = useState<{
     x: number;
@@ -48,7 +119,10 @@ export const FileTreeProvider = ({
   } | null>(null);
   const { unregisterFolderRef } = useFolderRefContext();
   const [searchQuery, setSearchQuery] = useState("");
-  const nodePositionMap = useMemo(() => assignPositions(treeData), [treeData]);
+  const nodePositionMap = useMemo(() => {
+    if (!treeData) return new Map();
+    return assignPositions(treeData);
+  }, [treeData]);
   const matchedNodes = useMemo(() => {
     if (!searchQuery) return [];
     return [...nodePositionMap.values()].filter((node) =>
@@ -57,6 +131,7 @@ export const FileTreeProvider = ({
   }, [searchQuery, nodePositionMap]);
 
   const getPathFromNodeId = (nodeId: number): string[] => {
+    if (!treeData) return [];
     const nodeMap = new Map<number, Node>();
     const buildMap = (node: Node) => {
       nodeMap.set(node.id, node);
@@ -79,12 +154,13 @@ export const FileTreeProvider = ({
   const moveNodeToFolder = (nodeId: number, targetFolderId: number) => {
     setTreeData((prevTree) => {
       const cloneTree = structuredClone(prevTree);
-
+      if (!cloneTree) return prevTree;
       const nodeMap = new Map<number, Node>();
       const buildMap = (node: Node) => {
         nodeMap.set(node.id, node);
         node.children?.forEach(buildMap);
       };
+
       buildMap(cloneTree);
 
       const node = nodeMap.get(nodeId);
@@ -114,6 +190,8 @@ export const FileTreeProvider = ({
         nodeMap.set(node.id, node);
         node.children?.forEach(buildMap);
       };
+      if (!cloneTree) return prevTree;
+
       buildMap(cloneTree);
 
       const node = nodeMap.get(nodeId);
@@ -142,12 +220,13 @@ export const FileTreeProvider = ({
 
     setTreeData((prevTree) => {
       const cloneTree = structuredClone(prevTree);
-
+      if (!cloneTree) return prevTree;
       const nodeMap = new Map<number, Node>();
       const buildMap = (n: Node) => {
         nodeMap.set(n.id, n);
         n.children?.forEach(buildMap);
       };
+
       buildMap(cloneTree);
       if (!node.parentId) return prevTree;
       const parent = nodeMap.get(node.parentId);
@@ -155,6 +234,76 @@ export const FileTreeProvider = ({
 
       parent.children = parent.children || [];
       parent.children.push(node);
+
+      return cloneTree;
+    });
+  };
+
+  const createNewFolder = (
+    targetFolderId: number,
+    folderName: string,
+    newFolderId: number,
+  ) => {
+    setTreeData((prevTree) => {
+      const cloneTree = structuredClone(prevTree);
+      if (!cloneTree) return prevTree;
+
+      const nodeMap = new Map<number, Node>();
+      const buildMap = (n: Node) => {
+        nodeMap.set(n.id, n);
+        n.children?.forEach(buildMap);
+      };
+      buildMap(cloneTree);
+
+      const target = nodeMap.get(targetFolderId);
+      if (!target || target.type !== "folder") return prevTree;
+
+      const newFolder: Node = {
+        id: newFolderId,
+        name: folderName,
+        type: "folder",
+        parentId: targetFolderId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        children: [],
+      };
+
+      target.children = target.children || [];
+      target.children.push(newFolder);
+
+      return cloneTree;
+    });
+  };
+
+  const addFilesToFolder = (
+    targetFolderId: number,
+    files: { fileId: number; fileName: string }[],
+  ) => {
+    setTreeData((prevTree) => {
+      const cloneTree = structuredClone(prevTree);
+      if (!cloneTree) return prevTree;
+
+      const nodeMap = new Map<number, Node>();
+      const buildMap = (n: Node) => {
+        nodeMap.set(n.id, n);
+        n.children?.forEach(buildMap);
+      };
+      buildMap(cloneTree);
+
+      const target = nodeMap.get(targetFolderId);
+      if (!target || target.type !== "folder") return prevTree;
+
+      const newNodes: Node[] = files.map((file) => ({
+        id: file.fileId,
+        name: file.fileName,
+        type: "file",
+        parentId: targetFolderId,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      }));
+
+      target.children = target.children || [];
+      target.children.push(...newNodes);
 
       return cloneTree;
     });
@@ -173,6 +322,8 @@ export const FileTreeProvider = ({
         moveNodeToFolder,
         deleteNodeToTrash,
         restoreNodeFromTrash,
+        createNewFolder,
+        addFilesToFolder,
         isMenu,
         setIsMenu,
         menuNodeId,
