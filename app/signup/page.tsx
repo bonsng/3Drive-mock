@@ -9,7 +9,7 @@ export default function Page() {
       <div className="w-3/5">
         <LoginPage3D />
       </div>
-      <div className="w-2/5 mr-48 mb-10 flex justify-center items-center flex-col">
+      <div className="w-2/5 mr-48 mb-10 flex justify-center items-center flex-col z-50">
         <SignupForm />
       </div>
     </div>

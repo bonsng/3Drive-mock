@@ -3,57 +3,33 @@ import Image from "next/image";
 type PFilePreview = {
   title: string;
   ext: string;
-  url: string | undefined;
+  onDownload?: () => void;
 };
 
-const FilePreview = ({ title, ext, url }: PFilePreview) => {
+const FilePreview = ({ title, ext, onDownload }: PFilePreview) => {
   const renderPreview = () => {
-    if (ext === "video") {
-      return (
-        <video
-          src={url}
-          controls
-          className="relative w-full max-w-[85%] aspect-video mx-auto object-contain"
-        />
-      );
-    } else if (ext === "image") {
-      return (
-        <div className="relative w-full max-w-[85%] aspect-video mx-auto">
-          {url ? (
-            <Image
-              src={url}
-              alt={title}
-              fill
-              className="object-contain"
-              unoptimized
-            />
-          ) : (
-            <div className="text-white text-center p-4">
-              이미지 경로가 없습니다.
-            </div>
-          )}
+    return (
+      <div className="flex flex-col  p-4 gap-10 items-center justify-start">
+        <div className="text-3xl font-semibold font-poppins">{title}</div>
+        <div className="relative w-2/3 h-48">
+          <Image
+            src={`/icon-tex/${ext}-tex.png`}
+            alt={`${ext} icon`}
+            layout="fill"
+            objectFit="contain"
+          />
         </div>
-      );
-    } else if (ext === "pdf") {
-      return (
-        <iframe
-          src={url}
-          title={title}
-          className="relative w-full max-w-[85%] aspect-video mx-auto"
-        />
-      );
-    } else {
-      return (
         <div
-          className="flex flex-col items-center justify-center w-1/2 py-20 rounded-md shadow-2xl text-center space-y-4 bg-[#4c494c]"
+          className="flex flex-col items-center justify-center  rounded-md shadow-2xl text-center space-y-4 "
           onClick={(e) => {
             e.stopPropagation();
           }}
         >
-          <p className="text-white text-lg">미리보기에 문제가 발생했습니다.</p>
+          {/*<p className="text-white text-lg">미리보기에 문제가 발생했습니다.</p>*/}
           <div className="flex gap-6">
             <button
               type="button"
+              onClick={onDownload}
               className="px-5 py-3 text-base font-medium text-center inline-flex items-center cursor-pointer text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               <svg
@@ -94,8 +70,8 @@ const FilePreview = ({ title, ext, url }: PFilePreview) => {
             </button>
           </div>
         </div>
-      );
-    }
+      </div>
+    );
   };
 
   return renderPreview();

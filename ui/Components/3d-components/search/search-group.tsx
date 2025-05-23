@@ -21,7 +21,6 @@ export default function SearchGroup() {
             return (
               <React.Suspense fallback={null} key={node.id}>
                 <SearchFileSphere
-                  id={node.id}
                   position={[x, y, z]}
                   type={node.type}
                   title={node.name}

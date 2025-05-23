@@ -2,7 +2,6 @@
 
 import { LoginPage3D } from "@/ui/LoginPage/login-page-3D";
 import LoginForm from "@/ui/LoginPage/login-form";
-import Link from "next/link";
 
 export default function Page() {
   return (
@@ -10,7 +9,7 @@ export default function Page() {
       <div className="w-3/5">
         <LoginPage3D />
       </div>
-      <div className="w-2/5 mr-48 mb-10 flex justify-center items-center flex-col">
+      <div className="w-2/5 mr-48 mb-10 flex justify-center items-center flex-col z-10">
         <LoginForm />
       </div>
     </div>

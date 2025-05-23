@@ -9,7 +9,7 @@ import { Billboard, Html, useGLTF } from "@react-three/drei";
 import { getTypeFromExtension } from "@/lib/extension";
 
 export default function TrashCan() {
-  const { trashData, getPathFromNodeId } = useFileTree();
+  const { trashData } = useFileTree();
   const { isTrash } = useShowNavContext();
   const groupRef = useRef<THREE.Group>(null);
   const [hoveredFile, setHoveredFile] = useState<
@@ -17,10 +17,35 @@ export default function TrashCan() {
   >(undefined);
   const targetRotation = useRef(0);
   const trashCan3D = useGLTF("/models/recycle_bin.glb");
-  const image3D = useGLTF("/models/image_3d.glb");
+  const pdf = useGLTF("/models/pdf_3d.glb");
+  const excel = useGLTF("/models/excel_3d.glb");
+  const image = useGLTF("/models/image_3d.glb");
+  const video = useGLTF("/models/video_3d.glb");
+  const ppt = useGLTF("/models/ppt_3d.glb");
+  const pptx = useGLTF("/models/pptx_3d.glb");
+  const music = useGLTF("/models/mp3_3d.glb");
+  const zip = useGLTF("/models/zip_3d.glb");
+  const folder = useGLTF("/models/folder_3d.glb");
+  const free = useGLTF("/models/free_format_3d.glb");
   const ext = getTypeFromExtension(
     hoveredFile?.title?.split(".").pop()?.toLowerCase(),
   );
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const dummy = useGLTF("/models/pdf_3d.glb");
+  type GLTFResult = typeof dummy;
+
+  const modelMap: Record<string, GLTFResult> = {
+    pdf,
+    excel,
+    image,
+    video,
+    ppt,
+    pptx,
+    music,
+    zip,
+    free,
+    word: free,
+  };
 
   useEffect(() => {
     if (!isTrash) return;
@@ -60,7 +85,12 @@ export default function TrashCan() {
             />
           ) : (
             <primitive
-              object={image3D.scene.children[0].clone()}
+              receiveShadow={false}
+              object={
+                hoveredFile?.type === "file"
+                  ? modelMap[ext]?.scene.children[0].clone()
+                  : folder.scene.children[0].clone()
+              }
               scale={0.06}
               position={[0, 0.13, 0]}
               rotation={[0, Math.PI * -0.15, 0]}
@@ -81,10 +111,10 @@ export default function TrashCan() {
                 {hoveredFile !== undefined && (
                   <div className="text-lg">
                     <p>
-                      Kind: {ext !== "unknown" ? `${ext} ` : ""}
+                      Kind: {ext !== "free" ? `${ext} ` : ""}
                       {hoveredFile?.type}
                     </p>
-                    <p>Where: {getPathFromNodeId(hoveredFile.id).join("/")}</p>
+                    {/*<p>Where: {getPathFromNodeId(hoveredFile.id).join("/")}</p>*/}
                   </div>
                 )}
               </div>
@@ -97,7 +127,7 @@ export default function TrashCan() {
             trashData={trashData}
             setHoveredFile={setHoveredFile}
           />
-        </group>{" "}
+        </group>
       </group>
     </>
   );

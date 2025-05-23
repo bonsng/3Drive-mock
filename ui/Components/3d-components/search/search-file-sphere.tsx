@@ -8,7 +8,6 @@ import { Html } from "@react-three/drei";
 import clsx from "clsx";
 
 interface SearchFileSphereProps {
-  id: string;
   position: [number, number, number];
   type: "file" | "folder" | "root";
   title: string;
@@ -16,7 +15,6 @@ interface SearchFileSphereProps {
 }
 
 const SearchFileSphere = ({
-  id,
   position,
   type,
   title,

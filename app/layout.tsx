@@ -3,6 +3,7 @@ import "./globals.css";
 import GlobalNav from "@/ui/Components/global-nav";
 import Providers from "@/ui/providers";
 import React from "react";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "3Drive",
@@ -19,7 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`antialiased dark:text-white text-white`}>
+      <body
+        className={`antialiased dark:text-white text-white overflow-y-hidden`}
+      >
+        <Toaster position="bottom-center" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#12161F] to-[#1A1E29] z-0" />
+        <div className="absolute inset-0 bg-[url('/grid-bg2.png')] bg-cover bg-center opacity-80 z-0" />
         <Providers>
           <GlobalNav />
           {children}
