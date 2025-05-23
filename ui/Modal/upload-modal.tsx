@@ -1,6 +1,9 @@
 import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { ModalRef } from "@/ui/Modal/modal.type";
 import { useModal } from "@/ui/Modal/modal.hook";
+import { toast } from "react-hot-toast";
+import { useFileTree } from "@/ui/Components/context/file-tree-context";
+import { useSession } from "next-auth/react";
 
 export type PUploadModal = {
   title: string;
@@ -10,6 +13,7 @@ export type PUploadModal = {
 
 const UploadModal = forwardRef<ModalRef, PUploadModal>(
   ({ title, folderId, files }, ref) => {
+    const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -22,6 +26,7 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
         setIsClosing(false);
       }, 200);
     };
+    const { addFilesToFolder } = useFileTree();
     useImperativeHandle(ref, () => ({
       open: () => {
         setIsOpen(true);
@@ -49,7 +54,7 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
           className="absolute top-4 left-1/2 -translate-x-1/2 flex justify-between gap-4 w-full pt-2.5 px-5"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center">
+          <div className="flex items-center mt-6">
             <svg
               onClick={handleClose}
               xmlns="http://www.w3.org/2000/svg"
@@ -179,7 +184,32 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
             </button>
             <button
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer flex justify-center items-center"
-              onClick={() => {
+              onClick={async () => {
+                const formData = new FormData();
+                uploadedFiles.forEach((file) => {
+                  formData.append("file", file);
+                });
+                formData.append("parentId", folderId.toString());
+
+                const data = await toast.promise(
+                  fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/files`, {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                      Authorization: `Bearer ${session?.accessToken}`,
+                    },
+                  }).then(async (res) => {
+                    if (!res.ok) throw new Error("업로드 실패");
+                    return await res.json();
+                  }),
+                  {
+                    loading: "업로드 중입니다...",
+                    success: "업로드 성공!",
+                    error: "업로드에 실패했습니다.",
+                  },
+                );
+
+                addFilesToFolder(folderId, data.result);
                 handleClose();
               }}
               disabled={uploadedFiles.length === 0}
