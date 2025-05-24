@@ -79,41 +79,53 @@ const Finder = () => {
             folder.type === "folder" &&
             folder.id !== draggingNodeId
           ) {
+            // Swal.fire({
+            //   title: "이동하시겠습니까?",
+            //   icon: "question",
+            //   showCancelButton: true,
+            //   confirmButtonText: "이동",
+            //   cancelButtonText: "취소",
+            // }).then(async (result) => {
+            //   if (result.isConfirmed) {
+            //     const path =
+            //       draggedNode.type === "folder"
+            //         ? `/folders/${draggingNodeId}`
+            //         : `/files/${draggedNode.parentId}/${draggedNode.name}`;
+            //     const formData = new FormData();
+            //     formData.append("targetId", folder.id);
+            //     try {
+            //       const res = await fetch(
+            //         `${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`,
+            //         {
+            //           method: "POST",
+            //           headers: {
+            //             Authorization: `Bearer ${session?.accessToken}`,
+            //           },
+            //           body: formData,
+            //         },
+            //       );
+            //
+            //       if (!res.ok) {
+            //         throw new Error("파일 이동 실패");
+            //       }
+            //
+            //       moveNodeToFolder(draggingNodeId, folder.id);
+            //       toast.success("파일이 이동되었습니다.");
+            //     } catch {
+            //       toast.error("잘못된 위치입니다.");
+            //     }
+            //   }
+            // });
             Swal.fire({
-              title: "이동하시겠습니까?",
               icon: "question",
+              title: "이동하시겠습니까?",
               showCancelButton: true,
               confirmButtonText: "이동",
               cancelButtonText: "취소",
             }).then(async (result) => {
               if (result.isConfirmed) {
-                const path =
-                  draggedNode.type === "folder"
-                    ? `/folders/${draggingNodeId}`
-                    : `/files/${draggedNode.parentId}/${draggedNode.name}`;
-                const formData = new FormData();
-                formData.append("targetId", folder.id);
-                try {
-                  const res = await fetch(
-                    `${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`,
-                    {
-                      method: "POST",
-                      headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
-                      },
-                      body: formData,
-                    },
-                  );
-
-                  if (!res.ok) {
-                    throw new Error("파일 이동 실패");
-                  }
-
-                  moveNodeToFolder(draggingNodeId, folder.id);
-                  toast.success("파일이 이동되었습니다.");
-                } catch {
-                  toast.error("잘못된 위치입니다.");
-                }
+                moveNodeToFolder(draggingNodeId, folder.id);
+                toast.success("파일이 이동되었습니다.");
               }
             });
             break;

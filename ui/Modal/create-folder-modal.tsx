@@ -17,7 +17,7 @@ export type PCreateFolderModal = {
 
 const CreateFolderModal = forwardRef<ModalRef, PCreateFolderModal>(
   ({ targetFolderId }, ref) => {
-    const { data: session } = useSession();
+    // const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [value, setValue] = useState("제목없는 폴더");
@@ -76,38 +76,44 @@ const CreateFolderModal = forwardRef<ModalRef, PCreateFolderModal>(
             <button
               className="text-blue-600 font-semibold cursor-pointer"
               onClick={async () => {
-                toast.promise(
-                  (async () => {
-                    const formData = new FormData();
-                    formData.append("folderName", value);
-                    formData.append("parentId", String(targetFolderId));
-
-                    const res = await fetch(
-                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/folders`,
-                      {
-                        method: "POST",
-                        body: formData,
-                        headers: {
-                          Authorization: `Bearer ${session?.accessToken}`,
-                        },
-                      },
-                    );
-
-                    if (!res.ok) throw new Error("폴더 생성 실패");
-
-                    const data = await res.json();
-                    createNewFolder(
-                      targetFolderId,
-                      value,
-                      data?.result?.folderId,
-                    );
-                  })(),
-                  {
-                    loading: "폴더를 생성 중입니다...",
-                    success: "폴더가 생성되었습니다!",
-                    error: "폴더 생성에 실패했습니다.",
-                  },
+                // toast.promise(
+                //   (async () => {
+                //     const formData = new FormData();
+                //     formData.append("folderName", value);
+                //     formData.append("parentId", String(targetFolderId));
+                //
+                //     const res = await fetch(
+                //       `${process.env.NEXT_PUBLIC_BACKEND_URL}/folders`,
+                //       {
+                //         method: "POST",
+                //         body: formData,
+                //         headers: {
+                //           Authorization: `Bearer ${session?.accessToken}`,
+                //         },
+                //       },
+                //     );
+                //
+                //     if (!res.ok) throw new Error("폴더 생성 실패");
+                //
+                //     const data = await res.json();
+                //     createNewFolder(
+                //       targetFolderId,
+                //       value,
+                //       data?.result?.folderId,
+                //     );
+                //   })(),
+                //   {
+                //     loading: "폴더를 생성 중입니다...",
+                //     success: "폴더가 생성되었습니다!",
+                //     error: "폴더 생성에 실패했습니다.",
+                //   },
+                // );
+                createNewFolder(
+                  targetFolderId,
+                  value,
+                  Date.now() + Math.random(),
                 );
+                toast.success("폴더가 생성되었습니다!");
                 handleClose();
               }}
             >

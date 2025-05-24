@@ -3,7 +3,6 @@ import { ModalRef } from "@/ui/Modal/modal.type";
 import { useModal } from "@/ui/Modal/modal.hook";
 import { toast } from "react-hot-toast";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
-import { useSession } from "next-auth/react";
 
 export type PUploadModal = {
   title: string;
@@ -13,7 +12,7 @@ export type PUploadModal = {
 
 const UploadModal = forwardRef<ModalRef, PUploadModal>(
   ({ title, folderId, files }, ref) => {
-    const { data: session } = useSession();
+    // const { data: session } = useSession();
     const [isOpen, setIsOpen] = useState(false);
     const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -184,34 +183,45 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
             </button>
             <button
               className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded cursor-pointer flex justify-center items-center"
-              onClick={async () => {
-                const formData = new FormData();
-                uploadedFiles.forEach((file) => {
-                  formData.append("file", file);
-                });
-                formData.append("parentId", folderId.toString());
-
-                const data = await toast.promise(
-                  fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/files`, {
-                    method: "POST",
-                    body: formData,
-                    headers: {
-                      Authorization: `Bearer ${session?.accessToken}`,
-                    },
-                  }).then(async (res) => {
-                    if (!res.ok) throw new Error("업로드 실패");
-                    return await res.json();
-                  }),
-                  {
-                    loading: "업로드 중입니다...",
-                    success: "업로드 성공!",
-                    error: "업로드에 실패했습니다.",
-                  },
-                );
-
-                addFilesToFolder(folderId, data.result);
-                handleClose();
-              }}
+              onClick={
+                // async () => {
+                //   const formData = new FormData();
+                //   uploadedFiles.forEach((file) => {
+                //     formData.append("file", file);
+                //   });
+                //   formData.append("parentId", folderId.toString());
+                //
+                //   const data = await toast.promise(
+                //     fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/files`, {
+                //       method: "POST",
+                //       body: formData,
+                //       headers: {
+                //         Authorization: `Bearer ${session?.accessToken}`,
+                //       },
+                //     }).then(async (res) => {
+                //       if (!res.ok) throw new Error("업로드 실패");
+                //       return await res.json();
+                //     }),
+                //     {
+                //       loading: "업로드 중입니다...",
+                //       success: "업로드 성공!",
+                //       error: "업로드에 실패했습니다.",
+                //     },
+                //   );
+                //
+                //   addFilesToFolder(folderId, data.result);
+                //   handleClose();
+                // }
+                () => {
+                  const simplifiedFiles = uploadedFiles.map((file) => ({
+                    fileId: Date.now() + Math.random(),
+                    fileName: file.name,
+                  }));
+                  addFilesToFolder(folderId, simplifiedFiles);
+                  toast.success("업로드 성공!");
+                  handleClose();
+                }
+              }
               disabled={uploadedFiles.length === 0}
             >
               <svg

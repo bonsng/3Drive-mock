@@ -16,10 +16,10 @@ export default function MainPage() {
           more easily.
         </div>
         <Link
-          href="/login"
+          href="/example"
           className="text-slate-950 mt-20 px-12 py-5 bg-gradient-to-r from-[#C9D6FF] to-[#E2E2E2] text-xl font-semibold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-transform duration-300 hover:cursor-pointer"
         >
-          Get Started
+          예시 파일 트리 보기
         </Link>
       </div>
     </div>

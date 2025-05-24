@@ -2,7 +2,7 @@ import { toast } from "react-hot-toast";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
 import { useModal } from "@/ui/Modal/modal.hook";
 import { getTypeFromExtension } from "@/lib/extension";
-import { useSession } from "next-auth/react";
+import Swal from "sweetalert2";
 
 const ContextMenu = ({
   id,
@@ -11,7 +11,7 @@ const ContextMenu = ({
   id: number;
   type: "file" | "folder" | "root" | undefined;
 }) => {
-  const { data: session } = useSession();
+  // const { data: session } = useSession();
   const { contextMenuPos, nodePositionMap, deleteNodeToTrash } = useFileTree();
   const content = nodePositionMap.get(id);
   const { openModal } = useModal(type === "file" ? "FileModal" : "UploadModal");
@@ -34,30 +34,44 @@ const ContextMenu = ({
 
   const handleDelete = async () => {
     if (!content) return;
-
-    const path =
-      content.type === "file"
-        ? `/files/${content.parentId}/${content.name}`
-        : `/folders/${content.id}`;
-    const formData = new FormData();
-    formData.append("targetId", session?.trashFolderId?.toString() ?? "");
-    await toast.promise(
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`, {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${session?.accessToken}`,
-        },
-      }).then((res) => {
-        if (!res.ok) throw new Error("삭제 실패");
+    Swal.fire({
+      icon: "warning",
+      title: "휴지통으로 이동하시겠습니까?",
+      text: "이 작업은 복구할 수 없습니다.",
+      showCancelButton: true,
+      confirmButtonText: "휴지통으로 이동",
+      cancelButtonText: "취소",
+    }).then((result) => {
+      /* Read more about isConfirmed, isDenied below */
+      if (result.isConfirmed) {
         deleteNodeToTrash(id);
-      }),
-      {
-        loading: "삭제 중입니다...",
-        success: "삭제되었습니다.",
-        error: "삭제에 실패했습니다.",
-      },
-    );
+        toast.success("파일이 휴지통으로 이동되었습니다.");
+      }
+    });
+
+    // const path =
+    //   content.type === "file"
+    //     ? `/files/${content.parentId}/${content.name}`
+    //     : `/folders/${content.id}`;
+    // const formData = new FormData();
+    // formData.append("targetId", session?.trashFolderId?.toString() ?? "");
+    // await toast.promise(
+    //   fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}${path}`, {
+    //     method: "POST",
+    //     body: formData,
+    //     headers: {
+    //       Authorization: `Bearer ${session?.accessToken}`,
+    //     },
+    //   }).then((res) => {
+    //     if (!res.ok) throw new Error("삭제 실패");
+    //     deleteNodeToTrash(id);
+    //   }),
+    //   {
+    //     loading: "삭제 중입니다...",
+    //     success: "삭제되었습니다.",
+    //     error: "삭제에 실패했습니다.",
+    //   },
+    // );
   };
 
   return contextMenuPos ? (

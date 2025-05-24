@@ -9,7 +9,7 @@ const SideNav = () => {
   return (
     <nav>
       <div
-        className={clsx("fixed top-0 left-5 h-full z-50 transition-transform", {
+        className={clsx("fixed top-0 left-5 h-full z-40 transition-transform", {
           "animate-slide-in-left": showNav,
         })}
       >

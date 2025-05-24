@@ -19,9 +19,12 @@ export default function GlobalNav() {
             </div>
           </div>
         ) : (
-          <Link href="/login" className="text-md">
-            Login
-          </Link>
+          // <Link href="/login" className="text-md">
+          //   Login
+          // </Link>
+          <span className="text-md text-gray-400 cursor-not-allowed">
+            demo@example.com
+          </span>
         )}
       </div>
     </nav>

@@ -7,13 +7,13 @@ import React, {
 } from "react";
 import {
   Node,
-  processBackendTree,
+  // processBackendTree,
   sampleTrash,
   sampleTree,
 } from "@/lib/sample-tree";
 import { assignPositions, PositionedNode } from "@/lib/positioning";
 import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 import { useLoading } from "@/ui/Components/context/loading-context";
 
 interface FileTreeContextType {
@@ -61,53 +61,14 @@ export const FileTreeProvider = ({
   const { setIsLoading } = useLoading();
   const [treeData, setTreeData] = useState<Node | null>(null);
   const [trashData, setTrashData] = useState<Node[]>([]);
-  const { data: session, status } = useSession();
+  // const { data: session, status } = useSession();
 
   useEffect(() => {
-    // if (status !== "authenticated") return;
-
-    const fetchTree = async () => {
-      const token = session?.accessToken;
-      if (!token) {
-        //sample code
-        setTreeData(sampleTree);
-        setTrashData(sampleTrash);
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/structure/full`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
-        );
-
-        if (!response.ok) {
-          setTreeData(sampleTree);
-          setTrashData(sampleTrash);
-          return;
-        }
-
-        const result = (await response.json()).result;
-        const { treeData, trashData } = processBackendTree(result);
-        setTreeData(treeData);
-        setTrashData(trashData);
-      } catch (error) {
-        console.error("Error fetching tree data:", error);
-        setTreeData(sampleTree);
-        setTrashData(sampleTrash);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     setIsLoading(true);
-    fetchTree();
-  }, [session, status, setIsLoading]);
+    setTreeData(sampleTree);
+    setTrashData(sampleTrash);
+    setIsLoading(false);
+  }, [setIsLoading]);
   const [fileDragging, setFileDragging] = useState(false);
   const [draggingNodeId, setDraggingNodeId] = useState<number | null>(null);
   const [isMenu, setIsMenu] = useState(false);
