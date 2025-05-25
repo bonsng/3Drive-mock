@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 import { ModalRef } from "@/ui/Modal/modal.type";
 import { useModal } from "@/ui/Modal/modal.hook";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
-import { useSession } from "next-auth/react";
+// import { useSession } from "next-auth/react";
 
 export type PCreateFolderModal = {
   targetFolderId: number;

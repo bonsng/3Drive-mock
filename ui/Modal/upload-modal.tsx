@@ -29,7 +29,6 @@ const UploadModal = forwardRef<ModalRef, PUploadModal>(
     useImperativeHandle(ref, () => ({
       open: () => {
         setIsOpen(true);
-        console.log("opened");
       },
       close: () => {
         setIsOpen(false);

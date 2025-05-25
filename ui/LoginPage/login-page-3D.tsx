@@ -4,7 +4,7 @@ import LogoModel from "@/lib/logo-model";
 
 export function LoginPage3D() {
   return (
-    <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 1], fov: 60 }}>
+    <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 2], fov: 60 }}>
       <ambientLight intensity={2} />
       <directionalLight position={[1, 0.5, 1]} intensity={300} />
       <directionalLight position={[-1, 0.5, 1]} intensity={300} />
