@@ -1,14 +1,18 @@
-import { FC, useEffect, useRef } from "react";
+import React, { FC, useEffect, useRef } from "react";
 import { useModalContext } from "./modal-context.provider";
-import { ModalRef, ModalTypes } from "./modal.type";
+import { ModalProps, ModalRef, ModalTypes } from "./modal.type";
 import FileModal from "@/ui/Modal/file-modal";
 import UploadModal from "@/ui/Modal/upload-modal";
 import CreateFolderModal from "@/ui/Modal/create-folder-modal";
+import GuideModal from "@/ui/Modal/guide-modal";
 
-const MODAL_COMPONENT: Record<ModalTypes, FC<any>> = {
-  FileModal: FileModal,
-  UploadModal: UploadModal,
-  CreateFolderModal: CreateFolderModal,
+const MODAL_COMPONENT: {
+  [K in ModalTypes]: FC<ModalProps<K> & { ref?: React.Ref<ModalRef> }>;
+} = {
+  FileModal,
+  UploadModal,
+  CreateFolderModal,
+  GuideModal,
 };
 
 export const ModalRenderer: FC = () => {
@@ -27,5 +31,16 @@ export const ModalRenderer: FC = () => {
 
   if (!state.isOpen || !state.modalType) return null;
 
-  return <ModalComponents ref={modalRef} {...state.props} />;
+  return (
+    <ModalComponents
+      title={""}
+      ext={""}
+      parentId={null}
+      folderId={0}
+      targetFolderId={0}
+      isFirst={false}
+      ref={modalRef}
+      {...state.props}
+    />
+  );
 };
