@@ -35,7 +35,7 @@ const GuideModal = forwardRef<ModalRef, PGuideModal>(({ isFirst }, ref) => {
         onClick={handleClose}
       >
         <div
-          className={`relative bg-gray-50 rounded-lg w-4/5 h-4/5 flex gap-4 text-black ${
+          className={`relative bg-gray-50 rounded-lg w-3/4 h-3/4 flex gap-4 text-black ${
             isClosing ? "animate-scale-out" : "animate-scale-in"
           }`}
           onClick={(e) => e.stopPropagation()}

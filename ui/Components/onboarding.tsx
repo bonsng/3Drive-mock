@@ -46,6 +46,7 @@ const details: Record<string, string> = {
 
 export default function Onboarding() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const hovered = tips[currentIndex].tag;
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -57,7 +58,11 @@ export default function Onboarding() {
         video.src = tips[currentIndex].video;
         video.load();
         video.onloadeddata = () => {
-          video.play().catch(() => {});
+          setIsLoading(true);
+          setTimeout(() => {
+            video.play().catch(() => {});
+            setIsLoading(false);
+          }, 1000);
         };
       }
     }
@@ -106,8 +111,16 @@ export default function Onboarding() {
         </button>
       </div>
 
-      <div className="mt-6 h-4/6 w-full flex gap-4">
-        <div className="w-3/5 h-full">
+      <div className="mt-10 h-4/7 w-full flex gap-4">
+        <div className="relative w-3/5 h-full">
+          {isLoading && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-white dark:bg-gray-900 bg-opacity-75 space-y-2">
+              <div className="w-12 h-12 border-[6px] border-blue-600 border-t-transparent rounded-full animate-spin shadow-lg" />
+              <span className="absolute bottom-32 text-sm text-gray-500 dark:text-gray-300 animate-pulse">
+                Loading video...
+              </span>
+            </div>
+          )}
           <video
             ref={videoRef}
             className="object-contain rounded-2xl w-full h-full"
@@ -117,7 +130,7 @@ export default function Onboarding() {
           />
         </div>
 
-        <div className="w-2/5 h-11/12 p-4 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col">
+        <div className="w-2/5 h-full p-4 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col">
           <h3 className="text-2xl font-semibold mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
             {tips[currentIndex].title}
           </h3>
