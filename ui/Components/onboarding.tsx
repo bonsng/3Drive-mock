@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import clsx from "clsx";
 
 const tips = [
@@ -45,10 +45,26 @@ const details: Record<string, string> = {
 };
 
 export default function Onboarding() {
-  const [hovered, setHovered] = useState<string>("explore");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const hovered = tips[currentIndex].tag;
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      if (video.src !== location.origin + tips[currentIndex].video) {
+        video.pause();
+        video.src = tips[currentIndex].video;
+        video.load();
+        video.onloadeddata = () => {
+          video.play().catch(() => {});
+        };
+      }
+    }
+  }, [currentIndex]);
 
   return (
-    <div className="rounded-xl p-8 bg-white dark:bg-gray-900 shadow-xl h-full overflow-y-hidden">
+    <div className="rounded-xl p-8 bg-white dark:bg-gray-900 shadow-xl h-full w-full overflow-y-hidden">
       <div className="text-center mb-6">
         <h2 className="text-2xl font-bold">👋 3Drive에 오신 걸 환영합니다!</h2>
         <p className="text-gray-500 dark:text-gray-400 mt-2">
@@ -56,10 +72,10 @@ export default function Onboarding() {
         </p>
       </div>
       <div className="grid grid-cols-5 gap-4">
-        {tips.map((tip) => (
+        {tips.map((tip, i) => (
           <div
             key={tip.title}
-            onMouseEnter={() => setHovered(tip.tag)}
+            onClick={() => setCurrentIndex(i)}
             className={clsx(
               "rounded-lg border border-gray-200 dark:border-gray-700 p-3 text-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-all cursor-pointer",
               hovered === tip.tag && "ring-2 ring-blue-500",
@@ -73,32 +89,41 @@ export default function Onboarding() {
         ))}
       </div>
 
+      <div className="flex justify-center mt-4 gap-4">
+        <button
+          onClick={() => setCurrentIndex((prev) => Math.max(0, prev - 1))}
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md cursor-pointer hover:bg-gray-400 shadow-inner transition-colors"
+        >
+          이전
+        </button>
+        <button
+          onClick={() =>
+            setCurrentIndex((prev) => Math.min(tips.length - 1, prev + 1))
+          }
+          className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md cursor-pointer hover:bg-gray-400 shadow-inner transition-colors"
+        >
+          다음
+        </button>
+      </div>
+
       <div className="mt-6 h-4/6 w-full flex gap-4">
         <div className="w-3/5 h-full">
           <video
-            src={tips.find((t) => t.tag === hovered)?.video}
-            className="object-contain rounded-2xl"
-            autoPlay
+            ref={videoRef}
+            className="object-contain rounded-2xl w-full h-full"
             muted
             loop
+            playsInline
           />
         </div>
 
         <div className="w-2/5 h-11/12 p-4 rounded-md border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex flex-col">
-          {hovered ? (
-            <>
-              <h3 className="text-2xl font-semibold mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
-                {tips.find((t) => t.tag === hovered)?.title}
-              </h3>
-              <p className="text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                {details[hovered]}
-              </p>
-            </>
-          ) : (
-            <p className="text-gray-500 dark:text-gray-400">
-              왼쪽에서 항목에 마우스를 올려보세요.
-            </p>
-          )}
+          <h3 className="text-2xl font-semibold mb-3 border-b border-gray-300 dark:border-gray-600 pb-2">
+            {tips[currentIndex].title}
+          </h3>
+          <p className="text-base text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
+            {details[hovered]}
+          </p>
         </div>
       </div>
     </div>
