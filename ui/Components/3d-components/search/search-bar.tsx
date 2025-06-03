@@ -3,27 +3,41 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 import useDebounce from "@/ui/Components/hooks/use-debounce";
 import { useFileTree } from "@/ui/Components/context/file-tree-context";
+import { useShowNavContext } from "@/ui/Components/context/nav-context";
 
 export default function SearchBar() {
-  const { showSearch } = useShortCutContext();
+  const { showPreSearch, setShowSearch, setShowPreSearch, showSearch } =
+    useShortCutContext();
   const inputRef = useRef<HTMLInputElement>(null);
+  const { setViewState } = useShowNavContext();
   const { setSearchQuery } = useFileTree();
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 500);
 
   useEffect(() => {
-    if (showSearch && inputRef.current) {
+    if (showPreSearch && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [showSearch]);
+  }, [showPreSearch]);
 
   useEffect(() => {
     setSearchQuery(debouncedQuery);
   }, [debouncedQuery, setSearchQuery]);
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && query && showPreSearch) {
+      // TODO: trigger desired action here
+      // ShowSearch -> True
+      // set view to searchView
+      setShowSearch(true);
+      setShowPreSearch(false);
+      setViewState(3);
+    }
+  };
+
   return (
     <AnimatePresence>
-      {showSearch && (
+      {(showPreSearch || showSearch) && (
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -37,11 +51,14 @@ export default function SearchBar() {
             placeholder="Search for apps and commands..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyDown}
             className="px-6 py-3 text-md text-gray-300 bg-[#1e1e1e] border border-[#333] rounded shadow-md w-96 outline-none placeholder-gray-500"
           />
-          {/*<div className="flex text-xs text-gray-400 mt-1 justify-end">*/}
-          {/*  *연관도가 높은 결과는 가깝게, 낮은 결과는 멀리 나타납니다.*/}
-          {/*</div>*/}
+          <div className="flex text-xs text-gray-50 mt-1 justify-end">
+            {showPreSearch
+              ? "*검색 결과만 보려면 Enter를 누르세요"
+              : "*전체 파일 구조로 돌아가려면 Esc를 누르세요"}
+          </div>
         </motion.div>
       )}
     </AnimatePresence>

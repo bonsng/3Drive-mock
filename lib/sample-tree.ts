@@ -118,6 +118,29 @@ export const sampleTree: Node = {
                   parentId: 8,
                   id: 10,
                 },
+                {
+                  name: "archive_sub",
+                  type: "folder",
+                  parentId: 8,
+                  id: 321,
+                  children: [
+                    {
+                      name: "archive_sub_sub",
+                      type: "folder",
+                      parentId: 321,
+                      id: 401,
+                      children: [
+                        {
+                          name: "archive5",
+                          type: "folder",
+                          parentId: 401,
+                          id: 777,
+                          children: [],
+                        },
+                      ],
+                    },
+                  ],
+                },
               ],
             },
           ],

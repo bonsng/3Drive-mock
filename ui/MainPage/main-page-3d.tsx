@@ -13,7 +13,6 @@ import { angles } from "@/lib/angles";
 import CameraControls from "@/ui/Components/3d-components/camera/camera-controls";
 import { useShowNavContext } from "@/ui/Components/context/nav-context";
 import { useLoading } from "@/ui/Components/context/loading-context";
-
 export default function MainPage3D() {
   const {
     nodePositionMap,
@@ -54,6 +53,7 @@ export default function MainPage3D() {
                 position: [-13, 0, 0],
                 fov: 60,
               }}
+              onCreated={({ camera }) => camera.layers.enable(1)}
             >
               <ambientLight intensity={2.0} />
               <directionalLight position={[-10, 3, 0]} intensity={10} />

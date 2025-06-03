@@ -45,7 +45,8 @@ interface FileTreeContextType {
   contextMenuPos: { x: number; y: number } | null;
   setContextMenuPos: (pos: { x: number; y: number } | null) => void;
   setSearchQuery: (query: string) => void;
-  matchedNodes: PositionedNode[];
+  matchedNodes: number[];
+  matchedPositionNodes: PositionedNode[];
   getPathFromNodeId: (nodeId: number) => string[];
 }
 
@@ -84,11 +85,15 @@ export const FileTreeProvider = ({
     if (!treeData) return new Map();
     return assignPositions(treeData);
   }, [treeData]);
-  const matchedNodes = useMemo(() => {
-    if (!searchQuery) return [];
-    return [...nodePositionMap.values()].filter((node) =>
-      node.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  const [matchedNodes, matchedPositionNodes] = useMemo(() => {
+    if (!searchQuery) return [[], []];
+
+    const matched: PositionedNode[] = [...nodePositionMap.values()].filter(
+      (node) => node.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
+    const ids = matched.map((node) => node.id);
+
+    return [ids, matched];
   }, [searchQuery, nodePositionMap]);
 
   const getPathFromNodeId = (nodeId: number): string[] => {
@@ -295,6 +300,7 @@ export const FileTreeProvider = ({
         setSearchQuery,
         matchedNodes,
         getPathFromNodeId,
+        matchedPositionNodes,
       }}
     >
       {children}

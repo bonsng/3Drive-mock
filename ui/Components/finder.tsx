@@ -24,9 +24,10 @@ import { toast } from "react-hot-toast";
 const Finder = () => {
   const { data: session } = useSession();
   const groupRef = useRef<THREE.Group>(null);
+  const innerGroupRef = useRef<THREE.Group>(null);
   const raycaster = useRef(new Raycaster());
   const { camera, mouse, scene } = useThree();
-  const { showSearch } = useShortCutContext();
+  const { showSearch, showPreSearch } = useShortCutContext();
   const { isTrash } = useShowNavContext();
   const {
     fileDragging,
@@ -35,6 +36,7 @@ const Finder = () => {
     setFileDragging,
     setDraggingNodeId,
     moveNodeToFolder,
+    matchedNodes,
   } = useFileTree();
   const { getFolderRefs } = useFolderRefContext();
   const { openModal, isOpen } = useModal("UploadModal");
@@ -59,6 +61,16 @@ const Finder = () => {
     else if (distance < 6.3) depth = 10;
     else depth = 11;
     setVisibleDepth(depth);
+
+    // Rotate groupRef around the pivot point when showSearch is true
+    if (showPreSearch && innerGroupRef.current) {
+      const group = innerGroupRef.current;
+      const pivot = new THREE.Vector3(-10, 1, 0);
+
+      group.position.sub(pivot);
+      group.rotateY(0.001);
+      group.position.add(pivot);
+    }
   });
 
   useEffect(() => {
@@ -210,6 +222,7 @@ const Finder = () => {
       <group ref={groupRef}>
         <group
           position={[-10, 0, 0]}
+          ref={innerGroupRef}
           visible={!showSearch}
           // rotation={[0, Math.PI * 0.64, 0]}
         >
@@ -230,6 +243,7 @@ const Finder = () => {
                   title={node.name}
                   showSearch={showSearch}
                   parentId={node.parentId}
+                  matched={matchedNodes.includes(node.id)}
                 />
 
                 {node.parentPosition && (
@@ -244,7 +258,6 @@ const Finder = () => {
           })}
         </group>
       </group>
-
       {isTrash && <TrashCan />}
 
       {showSearch && <SearchGroup />}

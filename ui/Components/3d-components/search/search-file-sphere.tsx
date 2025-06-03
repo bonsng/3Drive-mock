@@ -9,6 +9,7 @@ import clsx from "clsx";
 
 interface SearchFileSphereProps {
   position: [number, number, number];
+  initialPosition: [number, number, number];
   type: "file" | "folder" | "root";
   title: string;
   delay?: number;
@@ -16,6 +17,7 @@ interface SearchFileSphereProps {
 
 const SearchFileSphere = ({
   position,
+  initialPosition,
   type,
   title,
   delay = 0,
@@ -25,6 +27,8 @@ const SearchFileSphere = ({
   const [hovered, setHovered] = useState(false);
   const [initialScale, setInitialScale] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [currentPosition, setCurrentPosition] =
+    useState<[number, number, number]>(initialPosition);
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), delay);
@@ -64,10 +68,20 @@ const SearchFileSphere = ({
 
   useFrame(() => {
     if (!groupRef.current) return;
+
     const target = hovered ? 1.5 : initialScale;
     const current = groupRef.current.scale.x;
     const scale = THREE.MathUtils.lerp(current, target, 0.1);
     groupRef.current.scale.set(scale, scale, scale);
+
+    // animate position
+    const newPos = currentPosition.map((val, idx) =>
+      THREE.MathUtils.lerp(val, position[idx], 0.1),
+    ) as [number, number, number];
+    setCurrentPosition(newPos);
+
+    groupRef.current.position.set(...newPos);
+
     if (modelRef.current) {
       modelRef.current.rotation.y += 0.001;
     }
@@ -95,7 +109,7 @@ const SearchFileSphere = ({
     <>
       <group
         ref={groupRef}
-        position={[...position]}
+        position={currentPosition}
         onPointerEnter={handlePointerOver}
         onPointerLeave={handlePointerOut}
       >

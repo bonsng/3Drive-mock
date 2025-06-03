@@ -11,6 +11,7 @@ import { getTypeFromExtension } from "@/lib/extension";
 import { useModal } from "@/ui/Modal/modal.hook";
 import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
 import RootModel from "@/lib/root-model";
+import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
 
 interface PFileSphere {
   id: number;
@@ -19,10 +20,11 @@ interface PFileSphere {
   title?: string;
   showSearch: boolean;
   parentId: number | null;
+  matched: boolean;
 }
 
 const FileSphere = (props: PFileSphere) => {
-  const { id, position, type, title, showSearch, parentId } = props;
+  const { id, position, type, title, showSearch, parentId, matched } = props;
   const [hovered, setHovered] = useState(false);
   const {
     fileDragging,
@@ -32,6 +34,7 @@ const FileSphere = (props: PFileSphere) => {
     setMenuNodeId,
     setContextMenuPos,
   } = useFileTree();
+  const { showPreSearch } = useShortCutContext();
   const meshRef = useRef<THREE.Group>(null);
   const { openModal } = useModal("FileModal");
   const pressTimer = useRef<NodeJS.Timeout | null>(null);
@@ -108,7 +111,15 @@ const FileSphere = (props: PFileSphere) => {
   useFrame(() => {
     if (!meshRef.current) return;
 
-    const targetScale = hovered ? 1.5 : 1;
+    let targetScale = 1;
+
+    if (matched) {
+      const pulse = 0.05 * Math.sin(Date.now() * 0.005);
+      targetScale = (hovered ? 4.5 : 4.0) + pulse;
+    } else if (hovered) {
+      targetScale = 1.5;
+    }
+
     meshRef.current.scale.lerp(
       new THREE.Vector3(targetScale, targetScale, targetScale),
       0.1,
@@ -161,15 +172,20 @@ const FileSphere = (props: PFileSphere) => {
         <Html
           center
           position={[0, 0.05, 0]}
-          distanceFactor={2}
+          distanceFactor={matched ? 6 : 2}
           zIndexRange={[0, 10]}
         >
           <div
             className={clsx(
-              "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1 font-poppins",
+              " text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1 font-poppins",
               { "text-white font-bold": hovered },
               { "text-gray-400": !hovered },
               { "opacity-0 pointer-events-none": showSearch },
+
+              {
+                "text-6xl text-white font-bold animate-bounce ":
+                  showPreSearch && matched,
+              },
             )}
           >
             {title}

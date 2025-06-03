@@ -10,34 +10,45 @@ import { useShowNavContext } from "@/ui/Components/context/nav-context";
 interface ShortCutContextType {
   showSearch: boolean;
   setShowSearch: (value: boolean) => void;
+  showPreSearch: boolean;
+  setShowPreSearch: (value: boolean) => void;
 }
 
 const ShortCutContext = createContext<ShortCutContextType | null>(null);
 
 export const ShortCutProvider = ({ children }: { children: ReactNode }) => {
   const [showSearch, setShowSearch] = useState(false);
+  const [showPreSearch, setShowPreSearch] = useState(false);
   const { setShowNav, setViewState } = useShowNavContext();
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f") {
         e.preventDefault();
-        setShowSearch(true);
+        setShowPreSearch(true);
         setShowNav(false);
         setViewState(2);
       } else if (e.key === "Escape") {
-        setShowSearch(false);
-        setShowNav(true);
-        setViewState(0);
+        if (showSearch && !showPreSearch) {
+          setShowPreSearch(true);
+          setShowSearch(false);
+          setViewState(2);
+        } else if (!showSearch && showPreSearch) {
+          setShowPreSearch(false);
+          setShowNav(true);
+          setViewState(0);
+        }
       }
     };
 
     window.addEventListener("keydown", handle);
     return () => window.removeEventListener("keydown", handle);
-  }, [setShowNav, setViewState]);
+  }, [setShowNav, setViewState, showPreSearch, showSearch]);
 
   return (
-    <ShortCutContext.Provider value={{ showSearch, setShowSearch }}>
+    <ShortCutContext.Provider
+      value={{ showSearch, setShowSearch, showPreSearch, setShowPreSearch }}
+    >
       {children}
     </ShortCutContext.Provider>
   );
