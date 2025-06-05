@@ -48,6 +48,7 @@ interface FileTreeContextType {
   matchedNodes: number[];
   matchedPositionNodes: PositionedNode[];
   getPathFromNodeId: (nodeId: number) => string[];
+  getPositionFromNodeId: (nodeId: number) => PositionedNode | undefined;
 }
 
 const FileTreeContext = createContext<FileTreeContextType | undefined>(
@@ -115,6 +116,12 @@ export const FileTreeProvider = ({
     }
 
     return path;
+  };
+
+  const getPositionFromNodeId = (
+    nodeId: number,
+  ): PositionedNode | undefined => {
+    return nodePositionMap.get(nodeId);
   };
 
   const moveNodeToFolder = (nodeId: number, targetFolderId: number) => {
@@ -301,6 +308,7 @@ export const FileTreeProvider = ({
         matchedNodes,
         getPathFromNodeId,
         matchedPositionNodes,
+        getPositionFromNodeId,
       }}
     >
       {children}

@@ -55,8 +55,9 @@ export default function MainPage3D() {
               }}
               onCreated={({ camera }) => camera.layers.enable(1)}
             >
-              <ambientLight intensity={2.0} />
-              <directionalLight position={[-10, 3, 0]} intensity={10} />
+              <ambientLight intensity={10.0} />
+              <directionalLight position={[-11, 0, 0]} intensity={5} />
+              <directionalLight position={[-11, -2, 0]} intensity={5} />
 
               <Finder />
               <CameraControls

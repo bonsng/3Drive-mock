@@ -219,11 +219,11 @@ const Finder = () => {
 
   return (
     <>
-      <group ref={groupRef}>
+      <group ref={groupRef} visible={!showSearch}>
         <group
           position={[-10, 0, 0]}
           ref={innerGroupRef}
-          visible={!showSearch}
+
           // rotation={[0, Math.PI * 0.64, 0]}
         >
           {[...nodePositionMap.values()].map((node: PositionedNode) => {
@@ -260,7 +260,17 @@ const Finder = () => {
       </group>
       {isTrash && <TrashCan />}
 
-      {showSearch && <SearchGroup />}
+      {showSearch && (
+        <>
+          <pointLight
+            position={[-3, 0, 0]}
+            intensity={5}
+            distance={30}
+            decay={2}
+          />
+          <SearchGroup />
+        </>
+      )}
     </>
   );
 };

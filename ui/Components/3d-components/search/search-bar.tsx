@@ -17,6 +17,7 @@ export default function SearchBar() {
   useEffect(() => {
     if (showPreSearch && inputRef.current) {
       inputRef.current.focus();
+      setQuery("");
     }
   }, [showPreSearch]);
 

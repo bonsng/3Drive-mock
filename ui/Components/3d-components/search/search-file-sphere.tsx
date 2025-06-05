@@ -3,37 +3,67 @@ import FileModel from "@/lib/file-model";
 import { getTypeFromExtension } from "@/lib/extension";
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
-import { useFrame } from "@react-three/fiber";
+import { ThreeEvent, useFrame } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import clsx from "clsx";
+import { useFileTree } from "@/ui/Components/context/file-tree-context";
+import { useModal } from "@/ui/Modal/modal.hook";
 
 interface SearchFileSphereProps {
+  id: number;
   position: [number, number, number];
   initialPosition: [number, number, number];
   type: "file" | "folder" | "root";
   title: string;
   delay?: number;
+  parentId: number | null;
 }
 
 const SearchFileSphere = ({
+  id,
   position,
   initialPosition,
   type,
   title,
   delay = 0,
+  parentId,
 }: SearchFileSphereProps) => {
-  const groupRef = useRef<THREE.Group>(null);
   const modelRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   const [initialScale, setInitialScale] = useState(0);
   const [visible, setVisible] = useState(false);
+  const [showText, setShowText] = useState(false);
   const [currentPosition, setCurrentPosition] =
     useState<[number, number, number]>(initialPosition);
+  const { setMenuNodeId, setIsMenu, setContextMenuPos } = useFileTree();
+  const { openModal } = useModal("FileModal");
+  const extension = getTypeFromExtension(
+    title?.split(".").pop()?.toLowerCase(),
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), delay);
-    return () => clearTimeout(timer);
+    const textTimer = setTimeout(() => setShowText(true), delay + 500);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(textTimer);
+    };
   }, [delay]);
+
+  const handleDoubleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    if (title) openModal({ title, ext: extension, parentId });
+  };
+
+  const handlePointerOver = (e: PointerEvent) => {
+    e.stopPropagation();
+    setHovered(true);
+  };
+
+  const handlePointerOut = (e: PointerEvent) => {
+    e.stopPropagation();
+    setHovered(false);
+  };
 
   useEffect(() => {
     if (!visible) return;
@@ -67,12 +97,12 @@ const SearchFileSphere = ({
   }, [visible]);
 
   useFrame(() => {
-    if (!groupRef.current) return;
+    if (!modelRef.current) return;
 
     const target = hovered ? 1.5 : initialScale;
-    const current = groupRef.current.scale.x;
+    const current = modelRef.current.scale.x;
     const scale = THREE.MathUtils.lerp(current, target, 0.1);
-    groupRef.current.scale.set(scale, scale, scale);
+    modelRef.current.scale.set(scale, scale, scale);
 
     // animate position
     const newPos = currentPosition.map((val, idx) =>
@@ -80,7 +110,7 @@ const SearchFileSphere = ({
     ) as [number, number, number];
     setCurrentPosition(newPos);
 
-    groupRef.current.position.set(...newPos);
+    modelRef.current.position.set(...newPos);
 
     if (modelRef.current) {
       modelRef.current.rotation.y += 0.001;
@@ -94,56 +124,54 @@ const SearchFileSphere = ({
     }
   }, [hovered]);
 
-  if (!visible) return null;
-
-  const handlePointerOver = (e: PointerEvent) => {
+  const handleContextMenu = (e: ThreeEvent<MouseEvent>) => {
     e.stopPropagation();
-    setHovered(true);
-  };
-
-  const handlePointerOut = (e: PointerEvent) => {
-    e.stopPropagation();
-    setHovered(false);
+    const { clientX, clientY } = e.nativeEvent;
+    setContextMenuPos({ x: clientX, y: clientY });
+    setIsMenu(true);
+    setMenuNodeId(id);
   };
   return (
-    <>
-      <group
-        ref={groupRef}
-        position={currentPosition}
-        onPointerEnter={handlePointerOver}
-        onPointerLeave={handlePointerOut}
-      >
-        <group ref={modelRef}>
-          {type === "folder" ? (
-            <FolderModel />
-          ) : (
-            <FileModel
-              extension={getTypeFromExtension(
-                title?.split(".").pop()?.toLowerCase(),
-              )}
-            />
+    <group
+      ref={modelRef}
+      position={currentPosition}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+      onContextMenu={handleContextMenu}
+      onDoubleClick={type === "file" && handleDoubleClick}
+    >
+      {type === "folder" ? (
+        <FolderModel />
+      ) : (
+        <FileModel
+          extension={getTypeFromExtension(
+            title?.split(".").pop()?.toLowerCase(),
           )}
-        </group>
-        {title && (
-          <Html
-            center
-            position={[0, 0.06, 0]}
-            distanceFactor={1.3}
-            zIndexRange={[0, 5]}
+        />
+      )}
+      {title && (
+        <Html
+          center
+          position={[0, 0.06, 0]}
+          distanceFactor={1.3}
+          zIndexRange={[0, 5]}
+        >
+          <div
+            className={clsx(
+              "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1 duration-500 ease-in-out opacity-0",
+              { "text-white opacity-100": hovered && showText },
+              { "text-gray-400 opacity-100": !hovered && showText },
+            )}
           >
-            <div
-              className={clsx(
-                "bg-transparent text-xs whitespace-nowrap transition-opacity pointer-events-none rounded-sm p-1",
-                { "text-white": hovered },
-                { "text-gray-400": !hovered },
-              )}
-            >
-              {title}
-            </div>
-          </Html>
-        )}
-      </group>
-    </>
+            {title}
+          </div>
+        </Html>
+      )}
+      <mesh visible={false}>
+        <boxGeometry args={[0.1, 0.1, 0.1]} />
+        <meshBasicMaterial transparent={true} opacity={0} />
+      </mesh>
+    </group>
   );
 };
 

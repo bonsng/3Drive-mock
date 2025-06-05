@@ -3,6 +3,11 @@ import { useFileTree } from "@/ui/Components/context/file-tree-context";
 import { useModal } from "@/ui/Modal/modal.hook";
 import { getTypeFromExtension } from "@/lib/extension";
 import Swal from "sweetalert2";
+import { useShortCutContext } from "@/ui/Components/context/short-cut-context";
+import { useShowNavContext } from "@/ui/Components/context/nav-context";
+import { angles } from "@/lib/angles";
+import { useFolderRefContext } from "@/ui/Components/context/folder-ref-context";
+import * as THREE from "three";
 
 const ContextMenu = ({
   id,
@@ -12,10 +17,19 @@ const ContextMenu = ({
   type: "file" | "folder" | "root" | undefined;
 }) => {
   // const { data: session } = useSession();
-  const { contextMenuPos, nodePositionMap, deleteNodeToTrash } = useFileTree();
+  const {
+    contextMenuPos,
+    nodePositionMap,
+    deleteNodeToTrash,
+    setSearchQuery,
+    getPositionFromNodeId,
+  } = useFileTree();
+  const { showSearch, setShowSearch, setShowPreSearch } = useShortCutContext();
   const content = nodePositionMap.get(id);
   const { openModal } = useModal(type === "file" ? "FileModal" : "UploadModal");
   const { openModal: openCreateFolder } = useModal("CreateFolderModal");
+  const { setViewState, setShowNav } = useShowNavContext();
+  const { getFolderRefById } = useFolderRefContext();
   const handleOpen = () => {
     if (content) {
       if (type === "file") {
@@ -29,6 +43,50 @@ const ContextMenu = ({
       } else {
         openModal({ title: content.name, folderId: content.id });
       }
+    }
+  };
+
+  const handleGoView = (id: number) => {
+    const targetNode = getPositionFromNodeId(id);
+    if (targetNode) {
+      const folderRef = getFolderRefById(targetNode.parentId ?? 0);
+
+      if (folderRef) {
+        const mesh = folderRef;
+        const worldPosition = new THREE.Vector3();
+        mesh.getWorldPosition(worldPosition);
+
+        const cameraStart = new THREE.Vector3(-10, 0, 0);
+        const direction = new THREE.Vector3()
+          .subVectors(worldPosition, cameraStart)
+          .normalize();
+
+        const distanceToTarget = worldPosition.distanceTo(cameraStart);
+        const cameraDistance = Math.max(distanceToTarget - 0.3, 0.7); // 최소 거리 보장
+
+        const cameraPosition = new THREE.Vector3()
+          .copy(cameraStart)
+          .addScaledVector(direction, cameraDistance);
+
+        angles.pop();
+        angles.push({
+          position: {
+            x: cameraPosition.x,
+            y: cameraPosition.y,
+            z: cameraPosition.z,
+          },
+          target: {
+            x: worldPosition.x,
+            y: worldPosition.y,
+            z: worldPosition.z,
+          },
+        });
+      }
+      setViewState(4);
+      setSearchQuery("");
+      setShowSearch(false);
+      setShowPreSearch(false);
+      setShowNav(true);
     }
   };
 
@@ -79,6 +137,17 @@ const ContextMenu = ({
       className="fixed z-50 w-56 rounded-md bg-white shadow-lg border text-sm text-black"
       style={{ left: contextMenuPos.x, top: contextMenuPos.y }}
     >
+      {showSearch && (
+        <>
+          <div
+            className="px-4 py-2 hover:bg-gray-100 rounded-t-md cursor-pointer flex justify-between items-center"
+            onClick={() => handleGoView(id)}
+          >
+            <span>{type === "file" ? "🧭 파일 위치로" : "🧭 폴더 위치로"}</span>
+          </div>
+          <hr />
+        </>
+      )}
       <div
         className="px-4 py-2 hover:bg-gray-100 rounded-t-md cursor-pointer flex justify-between items-center"
         onClick={handleOpen}

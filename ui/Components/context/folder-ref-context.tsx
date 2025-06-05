@@ -5,6 +5,7 @@ interface FolderRefContextType {
   registerFolderRef: (id: number, ref: THREE.Object3D) => void;
   unregisterFolderRef: (id: number) => void;
   getFolderRefs: () => THREE.Object3D[];
+  getFolderRefById: (id: number) => THREE.Object3D | undefined;
 }
 
 const FolderRefContext = createContext<FolderRefContextType | null>(null);
@@ -27,9 +28,18 @@ export const FolderRefProvider = ({
 
   const getFolderRefs = () => Array.from(folderRefMap.current.values());
 
+  const getFolderRefById = (id: number): THREE.Object3D | undefined => {
+    return folderRefMap.current.get(id);
+  };
+
   return (
     <FolderRefContext.Provider
-      value={{ registerFolderRef, unregisterFolderRef, getFolderRefs }}
+      value={{
+        registerFolderRef,
+        unregisterFolderRef,
+        getFolderRefs,
+        getFolderRefById,
+      }}
     >
       {children}
     </FolderRefContext.Provider>

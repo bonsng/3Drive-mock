@@ -108,6 +108,10 @@ const TrashFileSphere = (props: PTrashFileSphere) => {
             </div>
           </Html>
         )}
+        <mesh visible={false}>
+          <boxGeometry args={[0.1, 0.1, 0.1]} />
+          <meshBasicMaterial transparent={true} opacity={0} />
+        </mesh>
       </group>
     </>
   );
