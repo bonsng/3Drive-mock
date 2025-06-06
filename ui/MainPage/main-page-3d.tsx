@@ -13,6 +13,7 @@ import { angles } from "@/lib/angles";
 import CameraControls from "@/ui/Components/3d-components/camera/camera-controls";
 import { useShowNavContext } from "@/ui/Components/context/nav-context";
 import { useLoading } from "@/ui/Components/context/loading-context";
+import SettingHelpNav from "@/ui/Components/setting-help-nav";
 export default function MainPage3D() {
   const {
     nodePositionMap,
@@ -85,6 +86,7 @@ export default function MainPage3D() {
       </div>
       {showNav && <SideNav />}
       <SearchBar />
+      <SettingHelpNav />
     </div>
   );
 }

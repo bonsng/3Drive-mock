@@ -5,6 +5,7 @@ import FileModal from "@/ui/Modal/file-modal";
 import UploadModal from "@/ui/Modal/upload-modal";
 import CreateFolderModal from "@/ui/Modal/create-folder-modal";
 import GuideModal from "@/ui/Modal/guide-modal";
+import SettingModal from "@/ui/Modal/setting-modal";
 
 const MODAL_COMPONENT: {
   [K in ModalTypes]: FC<ModalProps<K> & { ref?: React.Ref<ModalRef> }>;
@@ -13,6 +14,7 @@ const MODAL_COMPONENT: {
   UploadModal,
   CreateFolderModal,
   GuideModal,
+  SettingModal,
 };
 
 export const ModalRenderer: FC = () => {
@@ -38,7 +40,7 @@ export const ModalRenderer: FC = () => {
       parentId={null}
       folderId={0}
       targetFolderId={0}
-      isFirst={false}
+      isFirst={true}
       ref={modalRef}
       {...state.props}
     />
