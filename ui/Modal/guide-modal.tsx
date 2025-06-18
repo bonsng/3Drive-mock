@@ -31,18 +31,18 @@ const GuideModal = forwardRef<ModalRef, PGuideModal>(({ isFirst }, ref) => {
   return (
     isFirst && (
       <div
-        className={`fixed inset-0 z-50 bg-black/40 flex justify-center items-center ${isClosing && "animate-fade-out"}`}
+        className={`fixed inset-0 z-50 bg-transparent flex justify-center items-center ${isClosing && "animate-fade-out"}`}
         onClick={handleClose}
       >
         <div
-          className={`relative bg-gray-50 rounded-lg w-3/4 h-3/4 flex gap-4 text-black ${
+          className={`relative bg-white/10 backdrop-blur-md border border-white/20 shadow-xl rounded-lg w-3/4 h-3/4 flex gap-4 text-white ${
             isClosing ? "animate-scale-out" : "animate-scale-in"
           }`}
           onClick={(e) => e.stopPropagation()}
         >
           <button
             onClick={handleClose}
-            className="absolute cursor-pointer top-4 right-4 text-gray-500 hover:text-black dark:text-gray-400 dark:hover:text-white text-xl font-bold"
+            className="absolute cursor-pointer top-2 right-4 text-gray-500 hover:text-white text-xl font-bold"
             aria-label="Close"
           >
             ×
