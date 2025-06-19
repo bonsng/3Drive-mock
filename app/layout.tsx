@@ -24,8 +24,6 @@ export default function RootLayout({
         className={`antialiased dark:text-white text-white overflow-y-hidden`}
       >
         <Toaster position="bottom-center" />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#12161F] to-[#1A1E29] z-0" />
-        <div className="absolute inset-0 bg-[url('/grid-bg2.png')] bg-cover bg-center opacity-80 z-0" />
         <Providers>
           <GlobalNav />
           {children}
