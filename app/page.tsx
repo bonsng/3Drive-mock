@@ -18,7 +18,7 @@ export default function Home() {
           backgroundImage: `url(/grid-bg${bgState}.png)`,
         }}
       />
-      <div className={`  w-screen h-screen`}>
+      <div className={`w-screen h-screen`}>
         <main>{isLoggedIn ? <MainPage3D /> : <MainPage />}</main>
       </div>
     </>
