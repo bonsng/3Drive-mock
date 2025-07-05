@@ -1,12 +1,51 @@
 # 3Drive
-## 3D 클라우드 스토리지 서비스
+## 3D Cloud Storage Service
+<p align="left">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="typescript_icon" />
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="react-icon" />
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="nextjs-icon" />
+  <img src="https://img.shields.io/badge/React_Three_Fiber-000000?style=for-the-badge&logo=three.js&logoColor=white" alt="r3f-icon" />
+  <img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="tailwind-icon" />
+</p>
 
-### 📁 프로젝트 소개
+### 📁 Introduction
 
-3Drive는 3D 공간 기반의 클라우드 파일 탐색기입니다. 사용자는 브라우저 상에서 파일과 폴더를 입체적으로 탐색하고, 시각적으로 직관적인 방식으로 파일을 관리할 수 있습니다. React, Three.js, Next.js 기반으로 제작되었으며, WebGL을 활용하여 몰입감 있는 사용자 경험을 제공합니다.
+3Drive is a cloud file explorer based in 3D space. Users can browse and manage files and folders in an immersive and intuitive 3D environment directly from their browser. Built with React, Three.js, and Next.js, it leverages WebGL to deliver a visually engaging user experience.
 
 ---
 
-### 🔗 포트폴리오 버전 안내
+### 🔗 Portfolio Version (Mock Data)
 
-이 포트폴리오 버전은 실제 백엔드 서버와 통신하지 않으며, 목업 데이터 기반으로 동작합니다.
+This portfolio version does not communicate with a real backend server. It operates on mock data and includes limited functionality.
+
+---
+
+### ✨ Key Features
+
+- 🗂️ Visualize and explore files/folders in 3D space
+- 🎯 Intuitive drag-and-drop file interaction
+- 🧭 Hierarchical folder structure navigation
+- 🖼️ Preview file metadata and contents
+- 🔍 Zoom, pan, and rotate camera with ease
+
+---
+
+### ⚙️ Installation & Run Guide
+
+1. 📥 Clone the repository
+   ```bash
+   git clone https://github.com/your-id/3Drive.git
+   cd 3Drive
+   ```
+
+2. 📦 Install dependencies
+   ```bash
+   npm install
+   ```
+
+3. 🚀 Start the development server
+   ```bash
+   npm run dev
+   ```
+
+4. 🌐 Open your browser and visit: [http://localhost:3000](http://localhost:3000)
